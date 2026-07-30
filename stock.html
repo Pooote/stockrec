@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Stock Journal</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin:0; background:#09090b; color:#f4f4f5; font-family:-apple-system,system-ui,sans-serif; padding:24px; }
+  .wrap { max-width: 640px; margin: 0 auto; }
+  h1 { font-size: 22px; font-weight: 600; margin: 0 0 2px; }
+  .sub { color:#71717a; font-size: 13px; margin: 0 0 24px; }
+  .card { background:#18181b; border:1px solid #27272a; border-radius:12px; padding:16px; margin-bottom:24px; }
+  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px; }
+  input, select { background:#09090b; border:1px solid #27272a; border-radius:8px; padding:8px 10px; font-size:13px; color:#f4f4f5; width:100%; }
+  input:focus, select:focus { outline:none; border-color:#52525b; }
+  button.primary { display:inline-flex; align-items:center; gap:6px; background:#f4f4f5; color:#18181b; border:none; border-radius:8px; padding:8px 12px; font-size:13px; font-weight:500; cursor:pointer; }
+  button.primary:hover { background:#fff; }
+  button.primary:disabled { opacity:.5; cursor:not-allowed; }
+  .filter { width:100%; margin-bottom:16px; }
+  .empty { color:#71717a; font-size:13px; }
+  .error { display:flex; align-items:center; gap:8px; background:#4c0519; border:1px solid #9f1239; color:#fda4af; font-size:13px; border-radius:8px; padding:8px 12px; margin-bottom:16px; }
+
+  #loginScreen { max-width:280px; margin:100px auto; text-align:center; }
+  #loginScreen h1 { margin-bottom:4px; }
+  #loginScreen input { margin:16px 0 10px; text-align:center; letter-spacing:4px; font-size:18px; }
+  #loginScreen p.err { color:#fb7185; font-size:13px; min-height:18px; }
+  #app { display:none; }
+  #topbar { display:flex; justify-content:flex-end; margin-bottom:8px; }
+  #logoutBtn { background:none; border:none; color:#52525b; font-size:12px; cursor:pointer; }
+  #logoutBtn:hover { color:#a1a1aa; }
+
+  .group { border-bottom:1px solid #1f1f23; }
+  .group:first-child { border-top:1px solid #1f1f23; }
+  .grow { display:flex; align-items:center; gap:12px; padding:12px 4px; cursor:pointer; }
+  .grow:hover { background:#141416; }
+  .badge { flex-shrink:0; width:46px; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; letter-spacing:.3px; }
+  .name { flex:1; min-width:0; }
+  .name .t { font-weight:600; font-size:14px; }
+  .name .qty { color:#71717a; font-size:12px; margin-top:1px; }
+  .price { width:90px; text-align:right; font-size:14px; font-weight:500; }
+  .change { width:80px; text-align:right; font-size:13px; }
+  .change.pos { color:#34d399; } .change.neg { color:#fb7185; } .change.flat { color:#71717a; }
+  .pct { width:78px; text-align:right; }
+  .pct span { display:inline-block; font-size:12px; font-weight:600; padding:3px 8px; border-radius:6px; }
+  .pct.pos span { background:rgba(6,95,70,.35); color:#34d399; }
+  .pct.neg span { background:rgba(159,18,57,.35); color:#fb7185; }
+  .pct.flat span { background:#27272a; color:#a1a1aa; }
+  .chev { width:16px; color:#52525b; font-size:12px; transition: transform .15s; flex-shrink:0; }
+  .chev.open { transform: rotate(90deg); }
+
+  .details { padding: 4px 4px 14px 58px; }
+  .setprice { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .setprice input { width:110px; }
+  .setprice button { background:#27272a; border:1px solid #3f3f46; color:#d4d4d8; border-radius:6px; padding:7px 10px; font-size:12px; cursor:pointer; }
+  .setprice button:hover { background:#3f3f46; }
+  .setprice label { font-size:12px; color:#71717a; }
+
+  .txn { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-top:1px solid #1f1f23; }
+  .txn:first-of-type { border-top:none; }
+  .txn-left { font-size:12.5px; }
+  .txn-profit { font-size:11.5px; font-weight:600; margin-left:6px; }
+  .txn-profit.pos { color:#34d399; } .txn-profit.neg { color:#fb7185; }
+  .tag { font-size:11px; font-weight:600; padding:1px 6px; border-radius:4px; margin-right:6px; }
+  .tag.buy { background:rgba(6,95,70,.35); color:#34d399; }
+  .tag.sell { background:rgba(159,18,57,.35); color:#fb7185; }
+  .tag.watch { background:rgba(146,64,14,.35); color:#fbbf24; }
+  .txn-meta { color:#71717a; }
+  .del { background:none; border:none; color:#52525b; cursor:pointer; font-size:14px; padding:2px 6px; }
+  .del:hover { color:#fb7185; }
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <h1>Stock Journal</h1>
+  <p class="sub">Enter your PIN to continue</p>
+  <input id="pw" type="password" inputmode="numeric" placeholder="••••" onkeydown="if(event.key==='Enter')login()">
+  <button class="primary" style="width:100%" onclick="login()" id="loginBtn">Log in</button>
+  <p class="err" id="loginErr"></p>
+</div>
+
+<div id="app" class="wrap">
+  <div id="topbar"><button id="logoutBtn" onclick="logout()">Log out</button></div>
+  <h1>Stock Journal</h1>
+  <p class="sub">Track your buys, sells, and watchlist — synced across devices</p>
+
+  <div id="errorBanner" class="error" style="display:none;">Save failed. Check your internet connection.</div>
+
+  <div class="card">
+    <div class="grid">
+      <input id="f-ticker" placeholder="Ticker, e.g. PTT">
+      <select id="f-action">
+        <option value="buy">Buy</option>
+        <option value="sell">Sell</option>
+        <option value="watch">Watch</option>
+      </select>
+      <input id="f-price" type="number" placeholder="Price">
+      <input id="f-qty" type="number" placeholder="Quantity">
+      <input id="f-date" type="date">
+      <input id="f-note" placeholder="Note (optional)">
+    </div>
+    <button class="primary" onclick="addEntry()">+ Add entry</button>
+  </div>
+
+  <input class="filter" id="filter" placeholder="Search ticker..." oninput="render()">
+  <div id="list"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, collection, doc, addDoc, deleteDoc, setDoc,
+  onSnapshot, query
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// === Replace with your values from Firebase Console > Project settings > Your apps ===
+const firebaseConfig = {
+  apiKey: "AIzaSyAi3cy0ueunppSDCDGSyKj7X72kO3NtRTE",
+  authDomain: "stock-record-6925a.firebaseapp.com",
+  projectId: "stock-record-6925a",
+  storageBucket: "stock-record-6925a.firebasestorage.app",
+  messagingSenderId: "495239740483",
+  appId: "1:495239740483:web:ab9546d55c937dc6ece8f6"
+};
+// Fixed email for the single account in Firebase Console > Authentication > Users
+// The UI only shows a PIN field — the email is never shown to the user
+const OWNER_EMAIL = "araikordai@mail.com";
+// ==================================================================================
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+const LABELS = { buy: "Buy", sell: "Sell", watch: "Watch" };
+const PALETTE = ["#18181b","#991b1b","#1d4ed8","#0f766e","#7c3aed","#a16207","#374151","#be185d","#065f46"];
+
+let entries = [];
+let prices = {};
+let expanded = new Set();
+let unsubEntries = null, unsubPrices = null;
+
+document.getElementById("f-date").value = new Date().toISOString().slice(0,10);
+
+window.login = async function () {
+  const pw = document.getElementById("pw").value;
+  const btn = document.getElementById("loginBtn");
+  const err = document.getElementById("loginErr");
+  err.textContent = "";
+  btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, OWNER_EMAIL, pw);
+  } catch (e) {
+    err.textContent = "Wrong PIN or connection failed.";
+  } finally {
+    btn.disabled = false;
+  }
+};
+
+window.logout = function () { signOut(auth); };
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    document.getElementById("loginScreen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    subscribe();
+  } else {
+    document.getElementById("loginScreen").style.display = "block";
+    document.getElementById("app").style.display = "none";
+    if (unsubEntries) unsubEntries();
+    if (unsubPrices) unsubPrices();
+  }
+});
+
+function subscribe() {
+  unsubEntries = onSnapshot(
+    query(collection(db, "entries")),
+    (snap) => {
+      entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setError(false);
+      render();
+    },
+    () => setError(true)
+  );
+  unsubPrices = onSnapshot(
+    query(collection(db, "prices")),
+    (snap) => {
+      prices = {};
+      snap.docs.forEach(d => { prices[d.id] = d.data().price; });
+      render();
+    },
+    () => setError(true)
+  );
+}
+
+function setError(hasError) {
+  document.getElementById("errorBanner").style.display = hasError ? "flex" : "none";
+}
+
+window.addEntry = async function () {
+  const ticker = document.getElementById("f-ticker").value.trim().toUpperCase();
+  const action = document.getElementById("f-action").value;
+  const price = parseFloat(document.getElementById("f-price").value);
+  const qty = parseFloat(document.getElementById("f-qty").value);
+  const date = document.getElementById("f-date").value;
+  const note = document.getElementById("f-note").value.trim();
+  if (!ticker || isNaN(price) || isNaN(qty)) return;
+
+  try {
+    await addDoc(collection(db, "entries"), { ticker, action, price, qty, date, note });
+    setError(false);
+  } catch { setError(true); return; }
+
+  document.getElementById("f-ticker").value = "";
+  document.getElementById("f-price").value = "";
+  document.getElementById("f-qty").value = "";
+  document.getElementById("f-note").value = "";
+};
+
+window.deleteEntry = async function (id) {
+  try {
+    await deleteDoc(doc(db, "entries", id));
+    setError(false);
+  } catch { setError(true); }
+};
+
+window.setCurrentPrice = async function (ticker) {
+  const input = document.getElementById(`cp-${ticker}`);
+  const val = parseFloat(input.value);
+  if (isNaN(val)) return;
+  try {
+    await setDoc(doc(db, "prices", ticker), { price: val });
+    setError(false);
+  } catch { setError(true); }
+};
+
+window.toggle = function (ticker) {
+  if (expanded.has(ticker)) expanded.delete(ticker); else expanded.add(ticker);
+  render();
+};
+
+function colorFor(ticker) {
+  let h = 0;
+  for (let i = 0; i < ticker.length; i++) h = (h * 31 + ticker.charCodeAt(i)) >>> 0;
+  return PALETTE[h % PALETTE.length];
+}
+
+function groupByTicker(list) {
+  const map = {};
+  for (const e of list) {
+    if (!map[e.ticker]) map[e.ticker] = [];
+    map[e.ticker].push(e);
+  }
+  return map;
+}
+
+function render() {
+  const filterVal = document.getElementById("filter").value.trim().toUpperCase();
+  const groups = groupByTicker(entries.filter(e => e.ticker.includes(filterVal)));
+  const tickers = Object.keys(groups).sort();
+  const list = document.getElementById("list");
+
+  if (tickers.length === 0) {
+    list.innerHTML = '<p class="empty">No entries yet.</p>';
+    return;
+  }
+
+  list.innerHTML = tickers.map(ticker => {
+    const txns = groups[ticker].slice().sort((a,b) => b.date.localeCompare(a.date));
+    const buyQty = txns.filter(t => t.action === "buy").reduce((s,t) => s + t.qty, 0);
+    const buyValue = txns.filter(t => t.action === "buy").reduce((s,t) => s + t.qty * t.price, 0);
+    const sellQty = txns.filter(t => t.action === "sell").reduce((s,t) => s + t.qty, 0);
+    const heldQty = buyQty - sellQty;
+    const avgBuy = buyQty > 0 ? buyValue / buyQty : 0;
+    const currentPrice = prices[ticker];
+    const hasPrice = currentPrice !== undefined && !isNaN(currentPrice);
+    const changeAbs = hasPrice && avgBuy > 0 ? currentPrice - avgBuy : null;
+    const changePct = changeAbs !== null && avgBuy > 0 ? (changeAbs / avgBuy) * 100 : null;
+    const trend = changeAbs === null ? "flat" : changeAbs > 0 ? "pos" : changeAbs < 0 ? "neg" : "flat";
+    const isOpen = expanded.has(ticker);
+
+    return `
+      <div class="group">
+        <div class="grow" onclick="toggle('${ticker}')">
+          <div class="badge" style="background:${colorFor(ticker)}">${ticker.slice(0,4)}</div>
+          <div class="name">
+            <div class="t">${ticker}</div>
+            <div class="qty">Holding ${heldQty.toLocaleString()} shares${avgBuy ? " · avg cost " + avgBuy.toLocaleString(undefined,{maximumFractionDigits:2}) : ""}</div>
+          </div>
+          <div class="price">${hasPrice ? currentPrice.toLocaleString() : "-"}</div>
+          <div class="change ${trend}">${changeAbs === null ? "" : (changeAbs >= 0 ? "+" : "") + changeAbs.toLocaleString(undefined,{maximumFractionDigits:2})}</div>
+          <div class="pct ${trend}">${changePct === null ? "" : `<span>${changePct >= 0 ? "↑" : "↓"} ${Math.abs(changePct).toFixed(2)}%</span>`}</div>
+          <div class="chev ${isOpen ? "open" : ""}">▶</div>
+        </div>
+        ${isOpen ? `
+        <div class="details">
+          <div class="setprice">
+            <label>Current price</label>
+            <input id="cp-${ticker}" type="number" value="${hasPrice ? currentPrice : ""}" placeholder="Enter price">
+            <button onclick="setCurrentPrice('${ticker}')">Save</button>
+          </div>
+          ${txns.map(t => {
+            let profitHtml = "";
+            if (t.action === "buy" && hasPrice && t.price > 0) {
+              const pAbs = (currentPrice - t.price) * t.qty;
+              const pPct = ((currentPrice - t.price) / t.price) * 100;
+              const cls = pAbs >= 0 ? "pos" : "neg";
+              profitHtml = `<span class="txn-profit ${cls}">${pAbs >= 0 ? "+" : ""}${pAbs.toLocaleString(undefined,{maximumFractionDigits:2})} (${pPct >= 0 ? "+" : ""}${pPct.toFixed(2)}%)</span>`;
+            }
+            return `
+            <div class="txn">
+              <div class="txn-left">
+                <span class="tag ${t.action}">${LABELS[t.action]}</span>
+                <span>${t.qty} sh @ ${t.price.toLocaleString()}</span>
+                <span class="txn-meta"> · ${t.date}${t.note ? " · " + t.note : ""}</span>
+                ${profitHtml}
+              </div>
+              <button class="del" onclick="deleteEntry('${t.id}')">✕</button>
+            </div>
+          `;
+          }).join("")}
+        </div>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+</script>
+</body>
+</html>
