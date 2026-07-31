@@ -23,7 +23,8 @@ export default async function handler(req, res) {
 
   const data = await upstream.json();
   const result = data?.chart?.result?.[0];
-  const price = result?.meta?.regularMarketPrice;
+  const meta = result?.meta;
+  const price = meta?.regularMarketPrice;
 
   if (!result || price === undefined) {
     return res.status(404).json({
@@ -32,5 +33,10 @@ export default async function handler(req, res) {
   }
 
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.json({ ticker, price, currency: result.meta.currency || "" });
+  res.json({
+    ticker,
+    price,
+    previousClose: meta?.chartPreviousClose ?? meta?.previousClose ?? null,
+    currency: meta?.currency || "",
+  });
 }
