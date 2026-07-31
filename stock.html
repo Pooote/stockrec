@@ -95,7 +95,7 @@
 <div id="loginScreen">
   <h1>Stock Journal</h1>
   <p class="sub">Enter your PIN to continue</p>
-  <input id="pw" type="password" inputmode="numeric" placeholder="••••" onkeydown="if(event.key==='Enter')login()">
+  <input id="pw" type="password" inputmode="numeric" placeholder="••••••" onkeydown="if(event.key==='Enter')login()">
   <button class="primary" style="width:100%" onclick="login()" id="loginBtn">Log in</button>
   <p class="err" id="loginErr"></p>
 </div>
@@ -146,6 +146,8 @@ const firebaseConfig = {
   messagingSenderId: "495239740483",
   appId: "1:495239740483:web:ab9546d55c937dc6ece8f6"
 };
+// Fixed email for the single account in Firebase Console > Authentication > Users
+// The UI only shows a PIN field — the email is never shown to the user
 const OWNER_EMAIL = "araikordai@mail.com";
 // ==================================================================================
 
