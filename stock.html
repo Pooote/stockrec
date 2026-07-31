@@ -3,72 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <title>Stock Journal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
-  body { margin:0; background:#09090b; color:#f4f4f5; font-family:-apple-system,system-ui,sans-serif; padding:24px; }
-  .wrap { max-width: 640px; margin: 0 auto; }
-  h1 { font-size: 22px; font-weight: 600; margin: 0 0 2px; }
-  .sub { color:#71717a; font-size: 13px; margin: 0 0 24px; }
-  .card { background:#18181b; border:1px solid #27272a; border-radius:12px; padding:16px; margin-bottom:24px; }
-  .grid { display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:12px; }
-  input, select { background:#09090b; border:1px solid #27272a; border-radius:8px; padding:8px 10px; font-size:13px; color:#f4f4f5; width:100%; }
-  input:focus, select:focus { outline:none; border-color:#52525b; }
-  button.primary { display:inline-flex; align-items:center; gap:6px; background:#f4f4f5; color:#18181b; border:none; border-radius:8px; padding:8px 12px; font-size:13px; font-weight:500; cursor:pointer; }
-  button.primary:hover { background:#fff; }
-  button.primary:disabled { opacity:.5; cursor:not-allowed; }
-  .filter { width:100%; margin-bottom:16px; }
-  .empty { color:#71717a; font-size:13px; }
-  .error { display:flex; align-items:center; gap:8px; background:#4c0519; border:1px solid #9f1239; color:#fda4af; font-size:13px; border-radius:8px; padding:8px 12px; margin-bottom:16px; }
+  body { margin:0; background:#09090b; color:#e4e4e7; font-family:'Inter',sans-serif; font-size:15px; line-height:1.5; padding:28px 20px; }
+  .wrap { max-width:660px; margin:0 auto; }
+  h1 { font-size:26px; font-weight:700; letter-spacing:-0.5px; margin:0 0 4px; }
+  .sub { color:#71717a; font-size:14px; margin:0 0 28px; }
+  .card { background:#111113; border:1px solid #27272a; border-radius:14px; padding:18px; margin-bottom:24px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
+  input, select { background:#09090b; border:1px solid #27272a; border-radius:9px; padding:9px 12px; font-size:14px; font-family:'Inter',sans-serif; color:#e4e4e7; width:100%; transition:border-color .15s; }
+  input:focus, select:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.15); }
+  input::placeholder { color:#52525b; }
+  button.primary { display:inline-flex; align-items:center; gap:6px; background:#6366f1; color:#fff; border:none; border-radius:9px; padding:9px 16px; font-size:14px; font-family:'Inter',sans-serif; font-weight:600; cursor:pointer; transition:background .15s; }
+  button.primary:hover { background:#818cf8; }
+  button.primary:disabled { opacity:.45; cursor:not-allowed; }
+  .filter { width:100%; margin-bottom:18px; }
+  .empty { color:#52525b; font-size:14px; padding:12px 0; }
+  .error { display:flex; align-items:center; gap:8px; background:#3f0e18; border:1px solid #7f1d1d; color:#fca5a5; font-size:13.5px; border-radius:10px; padding:10px 14px; margin-bottom:18px; }
 
-  #loginScreen { max-width:280px; margin:100px auto; text-align:center; }
-  #loginScreen h1 { margin-bottom:4px; }
-  #loginScreen input { margin:16px 0 10px; text-align:center; letter-spacing:4px; font-size:18px; }
-  #loginScreen p.err { color:#fb7185; font-size:13px; min-height:18px; }
+  #loginScreen { max-width:300px; margin:120px auto; text-align:center; }
+  #loginScreen h1 { margin-bottom:6px; }
+  #loginScreen .sub { margin-bottom:28px; }
+  #loginScreen input { margin:0 0 12px; text-align:center; letter-spacing:6px; font-size:22px; padding:12px; }
+  #loginScreen p.err { color:#f87171; font-size:13px; min-height:20px; margin-top:8px; }
   #app { display:none; }
-  #topbar { display:flex; justify-content:flex-end; margin-bottom:8px; }
-  #logoutBtn { background:none; border:none; color:#52525b; font-size:12px; cursor:pointer; }
+  #topbar { display:flex; justify-content:flex-end; margin-bottom:4px; }
+  #logoutBtn { background:none; border:none; color:#52525b; font-size:13px; font-family:'Inter',sans-serif; cursor:pointer; padding:4px 0; }
   #logoutBtn:hover { color:#a1a1aa; }
 
   .group { border-bottom:1px solid #1f1f23; }
   .group:first-child { border-top:1px solid #1f1f23; }
-  .grow { display:flex; align-items:center; gap:12px; padding:12px 4px; cursor:pointer; }
-  .grow:hover { background:#141416; }
-  .badge { flex-shrink:0; width:46px; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; letter-spacing:.3px; }
+  .grow { display:flex; align-items:center; gap:14px; padding:14px 4px; cursor:pointer; user-select:none; }
+  .grow:hover { background:#0d0d10; }
+  .badge { flex-shrink:0; width:48px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; letter-spacing:.5px; }
   .name { flex:1; min-width:0; }
-  .name .t { font-weight:600; font-size:14px; }
-  .name .qty { color:#71717a; font-size:12px; margin-top:1px; }
-  .price { width:90px; text-align:right; font-size:14px; font-weight:500; }
-  .change { width:80px; text-align:right; font-size:13px; }
-  .change.pos { color:#34d399; } .change.neg { color:#fb7185; } .change.flat { color:#71717a; }
-  .pct { width:78px; text-align:right; }
-  .pct span { display:inline-block; font-size:12px; font-weight:600; padding:3px 8px; border-radius:6px; }
-  .pct.pos span { background:rgba(6,95,70,.35); color:#34d399; }
-  .pct.neg span { background:rgba(159,18,57,.35); color:#fb7185; }
-  .pct.flat span { background:#27272a; color:#a1a1aa; }
-  .chev { width:16px; color:#52525b; font-size:12px; transition: transform .15s; flex-shrink:0; }
-  .chev.open { transform: rotate(90deg); }
+  .name .t { font-weight:700; font-size:15px; letter-spacing:-0.2px; }
+  .name .qty { color:#71717a; font-size:12.5px; margin-top:2px; }
+  .price { width:90px; text-align:right; font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .change { width:82px; text-align:right; font-size:13.5px; font-variant-numeric:tabular-nums; }
+  .change.pos { color:#34d399; } .change.neg { color:#f87171; } .change.flat { color:#52525b; }
+  .pct { width:80px; text-align:right; }
+  .pct span { display:inline-block; font-size:12px; font-weight:700; padding:3px 8px; border-radius:6px; font-variant-numeric:tabular-nums; }
+  .pct.pos span { background:rgba(52,211,153,.12); color:#34d399; }
+  .pct.neg span { background:rgba(248,113,113,.12); color:#f87171; }
+  .pct.flat span { background:#1f1f23; color:#71717a; }
+  .chev { width:16px; color:#3f3f46; font-size:11px; transition:transform .2s; flex-shrink:0; }
+  .chev.open { transform:rotate(90deg); }
 
-  .details { padding: 4px 4px 14px 58px; }
-  .setprice { display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; }
-  .setprice input { width:110px; }
-  .setprice button { background:#27272a; border:1px solid #3f3f46; color:#d4d4d8; border-radius:6px; padding:7px 10px; font-size:12px; cursor:pointer; }
-  .setprice button:hover { background:#3f3f46; }
-  .setprice button:disabled { opacity:.5; cursor:not-allowed; }
-  .setprice label { font-size:12px; color:#71717a; }
-  .fetch-err { font-size:11px; color:#fb7185; width:100%; }
+  .details { padding:2px 4px 16px 62px; }
+  .setprice { display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
+  .setprice input { width:116px; font-size:13.5px; }
+  .setprice button { background:#1f1f23; border:1px solid #3f3f46; color:#a1a1aa; border-radius:8px; padding:7px 11px; font-size:12.5px; font-family:'Inter',sans-serif; cursor:pointer; transition:background .12s; }
+  .setprice button:hover { background:#27272a; }
+  .setprice button:disabled { opacity:.4; cursor:not-allowed; }
+  .setprice label { font-size:12.5px; color:#71717a; }
+  .fetch-err { font-size:12px; color:#f87171; width:100%; }
 
-  .txn { display:flex; align-items:center; justify-content:space-between; padding:6px 0; border-top:1px solid #1f1f23; }
+  .txn { display:flex; align-items:flex-start; justify-content:space-between; padding:9px 0; border-top:1px solid #1f1f23; gap:8px; }
   .txn:first-of-type { border-top:none; }
-  .txn-left { font-size:12.5px; }
-  .txn-profit { font-size:11.5px; font-weight:600; margin-left:6px; }
-  .txn-profit.pos { color:#34d399; } .txn-profit.neg { color:#fb7185; }
-  .tag { font-size:11px; font-weight:600; padding:1px 6px; border-radius:4px; margin-right:6px; }
-  .tag.buy { background:rgba(6,95,70,.35); color:#34d399; }
-  .tag.sell { background:rgba(159,18,57,.35); color:#fb7185; }
-  .tag.watch { background:rgba(146,64,14,.35); color:#fbbf24; }
+  .txn-left { font-size:13.5px; flex:1; line-height:1.6; }
+  .txn-profit { font-size:12px; font-weight:600; margin-left:6px; }
+  .txn-profit.pos { color:#34d399; } .txn-profit.neg { color:#f87171; }
+  .txn-actions { display:flex; gap:0; flex-shrink:0; margin-top:1px; }
+  .txn-edit, .del { background:none; border:none; color:#3f3f46; cursor:pointer; font-size:13px; padding:2px 6px; transition:color .12s; }
+  .txn-edit:hover { color:#a1a1aa; }
+  .del:hover { color:#f87171; }
+  .txn-form { margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .txn-form input, .txn-form select { font-size:13px; padding:7px 10px; }
+  .txn-form-btns { grid-column:span 2; display:flex; gap:8px; }
+  .txn-form-btns button { font-size:13px; font-family:'Inter',sans-serif; font-weight:600; padding:7px 14px; border-radius:8px; border:none; cursor:pointer; transition:background .12s; }
+  .btn-save { background:#6366f1; color:#fff; }
+  .btn-save:hover { background:#818cf8; }
+  .btn-cancel { background:#1f1f23; color:#a1a1aa; border:1px solid #3f3f46 !important; }
+  .btn-cancel:hover { background:#27272a; }
+  .tag { font-size:11px; font-weight:700; padding:2px 7px; border-radius:5px; margin-right:7px; letter-spacing:.3px; text-transform:uppercase; }
+  .tag.buy { background:rgba(52,211,153,.12); color:#34d399; }
+  .tag.sell { background:rgba(248,113,113,.12); color:#f87171; }
+  .tag.watch { background:rgba(251,191,36,.1); color:#fbbf24; }
   .txn-meta { color:#71717a; }
-  .del { background:none; border:none; color:#52525b; cursor:pointer; font-size:14px; padding:2px 6px; }
-  .del:hover { color:#fb7185; }
 </style>
 </head>
 <body>
@@ -114,7 +129,7 @@ import {
   getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, doc, addDoc, deleteDoc, setDoc,
+  getFirestore, collection, doc, addDoc, deleteDoc, setDoc, updateDoc,
   onSnapshot, query
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
@@ -139,9 +154,7 @@ const db = getFirestore(app);
 const LABELS = { buy: "Buy", sell: "Sell", watch: "Watch" };
 const PALETTE = ["#18181b","#991b1b","#1d4ed8","#0f766e","#7c3aed","#a16207","#374151","#be185d","#065f46"];
 
-let entries = [];
-let prices = {};
-let expanded = new Set();
+let entries = [], prices = {}, expanded = new Set(), editingId = null;
 let unsubEntries = null, unsubPrices = null;
 
 document.getElementById("f-date").value = new Date().toISOString().slice(0,10);
@@ -150,17 +163,11 @@ window.login = async function () {
   const pw = document.getElementById("pw").value;
   const btn = document.getElementById("loginBtn");
   const err = document.getElementById("loginErr");
-  err.textContent = "";
-  btn.disabled = true;
-  try {
-    await signInWithEmailAndPassword(auth, OWNER_EMAIL, pw);
-  } catch (e) {
-    err.textContent = "Wrong PIN or connection failed.";
-  } finally {
-    btn.disabled = false;
-  }
+  err.textContent = ""; btn.disabled = true;
+  try { await signInWithEmailAndPassword(auth, OWNER_EMAIL, pw); }
+  catch { err.textContent = "Wrong PIN or connection failed."; }
+  finally { btn.disabled = false; }
 };
-
 window.logout = function () { signOut(auth); };
 
 onAuthStateChanged(auth, (user) => {
@@ -177,29 +184,18 @@ onAuthStateChanged(auth, (user) => {
 });
 
 function subscribe() {
-  unsubEntries = onSnapshot(
-    query(collection(db, "entries")),
-    (snap) => {
-      entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      setError(false);
-      render();
-    },
-    () => setError(true)
-  );
-  unsubPrices = onSnapshot(
-    query(collection(db, "prices")),
-    (snap) => {
-      prices = {};
-      snap.docs.forEach(d => { prices[d.id] = d.data().price; });
-      render();
-    },
-    () => setError(true)
-  );
+  unsubEntries = onSnapshot(query(collection(db, "entries")), (snap) => {
+    entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    setError(false); render();
+  }, () => setError(true));
+  unsubPrices = onSnapshot(query(collection(db, "prices")), (snap) => {
+    prices = {};
+    snap.docs.forEach(d => { prices[d.id] = d.data().price; });
+    render();
+  }, () => setError(true));
 }
 
-function setError(hasError) {
-  document.getElementById("errorBanner").style.display = hasError ? "flex" : "none";
-}
+function setError(v) { document.getElementById("errorBanner").style.display = v ? "flex" : "none"; }
 
 window.addEntry = async function () {
   const ticker = document.getElementById("f-ticker").value.trim().toUpperCase();
@@ -209,58 +205,37 @@ window.addEntry = async function () {
   const date = document.getElementById("f-date").value;
   const note = document.getElementById("f-note").value.trim();
   if (!ticker || isNaN(price) || isNaN(qty)) return;
-
-  try {
-    await addDoc(collection(db, "entries"), { ticker, action, price, qty, date, note });
-    setError(false);
-  } catch { setError(true); return; }
-
-  document.getElementById("f-ticker").value = "";
-  document.getElementById("f-price").value = "";
-  document.getElementById("f-qty").value = "";
-  document.getElementById("f-note").value = "";
+  try { await addDoc(collection(db, "entries"), { ticker, action, price, qty, date, note }); setError(false); }
+  catch { setError(true); return; }
+  ["f-ticker","f-price","f-qty","f-note"].forEach(id => document.getElementById(id).value = "");
 };
 
 window.deleteEntry = async function (id) {
-  try {
-    await deleteDoc(doc(db, "entries", id));
-    setError(false);
-  } catch { setError(true); }
+  try { await deleteDoc(doc(db, "entries", id)); setError(false); } catch { setError(true); }
 };
 
 window.fetchPrice = async function (ticker) {
   const btn = document.querySelector(`#sp-${CSS.escape(ticker)} button`);
   const errEl = document.getElementById(`fe-${ticker}`);
   const input = document.getElementById(`cp-${ticker}`);
-  errEl.textContent = "";
-  btn.disabled = true;
-  btn.textContent = "…";
+  errEl.textContent = ""; btn.disabled = true; btn.textContent = "…";
   try {
     const res = await fetch(`/api/price?ticker=${encodeURIComponent(ticker)}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Fetch failed");
     input.value = data.price;
     await persistPrice(ticker, data.price);
-  } catch (e) {
-    errEl.textContent = e.message;
-  } finally {
-    btn.disabled = false;
-    btn.textContent = "↻ Fetch";
-  }
+  } catch (e) { errEl.textContent = e.message; }
+  finally { btn.disabled = false; btn.textContent = "↻ Fetch"; }
 };
 
 window.savePrice = async function (ticker) {
-  const input = document.getElementById(`cp-${ticker}`);
-  const val = parseFloat(input.value);
-  if (isNaN(val)) return;
-  await persistPrice(ticker, val);
+  const val = parseFloat(document.getElementById(`cp-${ticker}`).value);
+  if (!isNaN(val)) await persistPrice(ticker, val);
 };
 
 async function persistPrice(ticker, val) {
-  try {
-    await setDoc(doc(db, "prices", ticker), { price: val });
-    setError(false);
-  } catch { setError(true); }
+  try { await setDoc(doc(db, "prices", ticker), { price: val }); setError(false); } catch { setError(true); }
 }
 
 window.toggle = function (ticker) {
@@ -271,41 +246,48 @@ window.toggle = function (ticker) {
 function colorFor(ticker) {
   let h = 0;
   for (let i = 0; i < ticker.length; i++) h = (h * 31 + ticker.charCodeAt(i)) >>> 0;
-  return PALETTE[h % PALETTE.length];
+  return ["#18181b","#991b1b","#1d4ed8","#0f766e","#7c3aed","#a16207","#374151","#be185d","#065f46"][h % 9];
 }
 
 function groupByTicker(list) {
   const map = {};
-  for (const e of list) {
-    if (!map[e.ticker]) map[e.ticker] = [];
-    map[e.ticker].push(e);
-  }
+  for (const e of list) { if (!map[e.ticker]) map[e.ticker] = []; map[e.ticker].push(e); }
   return map;
 }
+
+window.editEntry = function (id) { editingId = id; render(); };
+window.cancelEdit = function () { editingId = null; render(); };
+window.saveEdit = async function (id) {
+  const action = document.getElementById(`e-action-${id}`).value;
+  const price = parseFloat(document.getElementById(`e-price-${id}`).value);
+  const qty = parseFloat(document.getElementById(`e-qty-${id}`).value);
+  const date = document.getElementById(`e-date-${id}`).value;
+  const note = document.getElementById(`e-note-${id}`).value.trim();
+  if (isNaN(price) || isNaN(qty)) return;
+  try { await updateDoc(doc(db, "entries", id), { action, price, qty, date, note }); setError(false); }
+  catch { setError(true); }
+  editingId = null; render();
+};
 
 function render() {
   const filterVal = document.getElementById("filter").value.trim().toUpperCase();
   const groups = groupByTicker(entries.filter(e => e.ticker.includes(filterVal)));
   const tickers = Object.keys(groups).sort();
   const list = document.getElementById("list");
-
-  if (tickers.length === 0) {
-    list.innerHTML = '<p class="empty">No entries yet.</p>';
-    return;
-  }
+  if (tickers.length === 0) { list.innerHTML = '<p class="empty">No entries yet.</p>'; return; }
 
   list.innerHTML = tickers.map(ticker => {
     const txns = groups[ticker].slice().sort((a,b) => b.date.localeCompare(a.date));
-    const buyQty = txns.filter(t => t.action === "buy").reduce((s,t) => s + t.qty, 0);
-    const buyValue = txns.filter(t => t.action === "buy").reduce((s,t) => s + t.qty * t.price, 0);
-    const sellQty = txns.filter(t => t.action === "sell").reduce((s,t) => s + t.qty, 0);
-    const heldQty = buyQty - sellQty;
-    const avgBuy = buyQty > 0 ? buyValue / buyQty : 0;
-    const currentPrice = prices[ticker];
-    const hasPrice = currentPrice !== undefined && !isNaN(currentPrice);
-    const changeAbs = hasPrice && avgBuy > 0 ? currentPrice - avgBuy : null;
-    const changePct = changeAbs !== null && avgBuy > 0 ? (changeAbs / avgBuy) * 100 : null;
-    const trend = changeAbs === null ? "flat" : changeAbs > 0 ? "pos" : changeAbs < 0 ? "neg" : "flat";
+    const buyQty   = txns.filter(t => t.action==="buy").reduce((s,t) => s+t.qty, 0);
+    const buyValue = txns.filter(t => t.action==="buy").reduce((s,t) => s+t.qty*t.price, 0);
+    const sellQty  = txns.filter(t => t.action==="sell").reduce((s,t) => s+t.qty, 0);
+    const heldQty  = buyQty - sellQty;
+    const avgBuy   = buyQty > 0 ? buyValue / buyQty : 0;
+    const cur = prices[ticker];
+    const has = cur !== undefined && !isNaN(cur);
+    const chgAbs = has && avgBuy > 0 ? cur - avgBuy : null;
+    const chgPct = chgAbs !== null && avgBuy > 0 ? (chgAbs/avgBuy)*100 : null;
+    const trend  = chgAbs === null ? "flat" : chgAbs > 0 ? "pos" : chgAbs < 0 ? "neg" : "flat";
     const isOpen = expanded.has(ticker);
 
     return `
@@ -316,43 +298,60 @@ function render() {
             <div class="t">${ticker}</div>
             <div class="qty">Holding ${heldQty.toLocaleString()} shares${avgBuy ? " · avg cost " + avgBuy.toLocaleString(undefined,{maximumFractionDigits:2}) : ""}</div>
           </div>
-          <div class="price">${hasPrice ? currentPrice.toLocaleString() : "-"}</div>
-          <div class="change ${trend}">${changeAbs === null ? "" : (changeAbs >= 0 ? "+" : "") + changeAbs.toLocaleString(undefined,{maximumFractionDigits:2})}</div>
-          <div class="pct ${trend}">${changePct === null ? "" : `<span>${changePct >= 0 ? "↑" : "↓"} ${Math.abs(changePct).toFixed(2)}%</span>`}</div>
-          <div class="chev ${isOpen ? "open" : ""}">▶</div>
+          <div class="price">${has ? cur.toLocaleString() : "—"}</div>
+          <div class="change ${trend}">${chgAbs===null ? "" : (chgAbs>=0?"+":"")+chgAbs.toLocaleString(undefined,{maximumFractionDigits:2})}</div>
+          <div class="pct ${trend}">${chgPct===null ? "" : `<span>${chgPct>=0?"↑":"↓"} ${Math.abs(chgPct).toFixed(2)}%</span>`}</div>
+          <div class="chev ${isOpen?"open":""}">▶</div>
         </div>
         ${isOpen ? `
         <div class="details">
           <div class="setprice" id="sp-${ticker}">
             <label>Current price</label>
-            <input id="cp-${ticker}" type="number" value="${hasPrice ? currentPrice : ""}" placeholder="Manual">
+            <input id="cp-${ticker}" type="number" value="${has ? cur : ""}" placeholder="Manual">
             <button onclick="fetchPrice('${ticker}')">↻ Fetch</button>
             <button onclick="savePrice('${ticker}')">Save</button>
             <span class="fetch-err" id="fe-${ticker}"></span>
           </div>
           ${txns.map(t => {
-            let profitHtml = "";
-            if (t.action === "buy" && hasPrice && t.price > 0) {
-              const pAbs = (currentPrice - t.price) * t.qty;
-              const pPct = ((currentPrice - t.price) / t.price) * 100;
-              const cls = pAbs >= 0 ? "pos" : "neg";
-              profitHtml = `<span class="txn-profit ${cls}">${pAbs >= 0 ? "+" : ""}${pAbs.toLocaleString(undefined,{maximumFractionDigits:2})} (${pPct >= 0 ? "+" : ""}${pPct.toFixed(2)}%)</span>`;
+            let profit = "";
+            if (t.action==="buy" && has && t.price>0) {
+              const pAbs = (cur-t.price)*t.qty;
+              const pPct = ((cur-t.price)/t.price)*100;
+              profit = `<span class="txn-profit ${pAbs>=0?"pos":"neg"}">${pAbs>=0?"+":""}${pAbs.toLocaleString(undefined,{maximumFractionDigits:2})} (${pPct>=0?"+":""}${pPct.toFixed(2)}%)</span>`;
             }
+            if (editingId === t.id) return `
+              <div class="txn"><div class="txn-left" style="width:100%">
+                <div class="txn-form">
+                  <select id="e-action-${t.id}">
+                    <option value="buy" ${t.action==="buy"?"selected":""}>Buy</option>
+                    <option value="sell" ${t.action==="sell"?"selected":""}>Sell</option>
+                    <option value="watch" ${t.action==="watch"?"selected":""}>Watch</option>
+                  </select>
+                  <input id="e-date-${t.id}" type="date" value="${t.date}">
+                  <input id="e-price-${t.id}" type="number" placeholder="Price" value="${t.price}">
+                  <input id="e-qty-${t.id}" type="number" placeholder="Quantity" value="${t.qty}">
+                  <input id="e-note-${t.id}" placeholder="Note (optional)" value="${t.note||""}" style="grid-column:span 2">
+                  <div class="txn-form-btns">
+                    <button class="btn-save" onclick="saveEdit('${t.id}')">Save</button>
+                    <button class="btn-cancel" onclick="cancelEdit()">Cancel</button>
+                  </div>
+                </div>
+              </div></div>`;
             return `
             <div class="txn">
               <div class="txn-left">
                 <span class="tag ${t.action}">${LABELS[t.action]}</span>
-                <span>${t.qty} sh @ ${t.price.toLocaleString()}</span>
-                <span class="txn-meta"> · ${t.date}${t.note ? " · " + t.note : ""}</span>
-                ${profitHtml}
+                <span>${t.qty.toLocaleString()} shares @ ${t.price.toLocaleString()} · ${t.date}${t.note?" · "+t.note:""}</span>
+                ${profit}
               </div>
-              <button class="del" onclick="deleteEntry('${t.id}')">✕</button>
-            </div>
-          `;
+              <div class="txn-actions">
+                <button class="txn-edit" onclick="editEntry('${t.id}')">✎</button>
+                <button class="del" onclick="deleteEntry('${t.id}')">✕</button>
+              </div>
+            </div>`;
           }).join("")}
         </div>` : ""}
-      </div>
-    `;
+      </div>`;
   }).join("");
 }
 </script>
