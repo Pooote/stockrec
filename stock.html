@@ -230,12 +230,14 @@ onAuthStateChanged(auth, (user) => {
 let firstLoad = true;
 
 function subscribe() {
-  fetchFxRate();
-  unsubEntries = onSnapshot(query(collection(db, "entries")), async (snap) => {
+  unsubEntries = onSnapshot(query(collection(db, "entries")), (snap) => {
     entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     setError(false);
-    if (firstLoad) { firstLoad = false; await refreshAll(); }
-    else { render(); }
+    render();
+    if (firstLoad) {
+      firstLoad = false;
+      refreshAll(); // fire-and-forget ไม่ await ไม่ block render
+    }
   }, () => setError(true));
   unsubPrices = onSnapshot(query(collection(db, "prices")), (snap) => {
     prices = {};
