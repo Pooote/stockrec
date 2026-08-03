@@ -219,6 +219,8 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("app").style.display = "block";
     subscribe();
+    // auto-fetch ราคาหลัง entries โหลดครั้งแรก (รอ 1.5s ให้ Firestore listener ยิงก่อน)
+    setTimeout(() => refreshAll(), 1500);
   } else {
     document.getElementById("loginScreen").style.display = "block";
     document.getElementById("app").style.display = "none";
@@ -227,17 +229,11 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-let firstLoad = true;
-
 function subscribe() {
   unsubEntries = onSnapshot(query(collection(db, "entries")), (snap) => {
     entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     setError(false);
     render();
-    if (firstLoad) {
-      firstLoad = false;
-      refreshAll(); // fire-and-forget ไม่ await ไม่ block render
-    }
   }, () => setError(true));
   unsubPrices = onSnapshot(query(collection(db, "prices")), (snap) => {
     prices = {};
@@ -436,6 +432,7 @@ function render() {
 
     const currSym = isThaiStock(ticker) ? "฿" : "$";
     const fmtMoney = (n) => currSym + Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+    const dayAbs = has && prevClose ? cur - prevClose : null;
     const dayPct = dayAbs !== null && prevClose ? (dayAbs/prevClose)*100 : null;
     const dayTrend = dayAbs === null ? "flat" : dayAbs > 0 ? "pos" : dayAbs < 0 ? "neg" : "flat";
     const dayHtml = dayAbs !== null
