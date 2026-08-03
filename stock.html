@@ -2,66 +2,69 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Stock Journal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; }
-  body { margin:0; background:#0f0f12; color:#ededf0; font-family:'Inter',sans-serif; font-size:15px; line-height:1.5; padding:28px 20px; }
+  body { margin:0; background:#0f0f12; color:#ededf0; font-family:'Inter',sans-serif; font-size:15px; line-height:1.5; padding:16px; }
   .wrap { max-width:660px; margin:0 auto; }
-  h1 { font-size:26px; font-weight:700; letter-spacing:-0.5px; margin:0 0 4px; }
-  .sub { color:#8b8b98; font-size:14px; margin:0 0 28px; }
-  .summary { background:#18181c; border:1px solid #2e2e35; border-radius:14px; padding:20px; margin-bottom:24px; }
-  .summary-top { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:8px; }
-  .summary-label { font-size:12.5px; color:#8b8b98; margin-bottom:4px; }
-  .summary-value { font-size:26px; font-weight:700; letter-spacing:-0.5px; font-variant-numeric:tabular-nums; }
-  .summary-sub { font-size:13px; color:#8b8b98; margin-top:2px; font-variant-numeric:tabular-nums; }
-  .summary-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
-  .summary-cell { background:#13131a; border-radius:10px; padding:12px 14px; }
+  h1 { font-size:20px; font-weight:700; letter-spacing:-0.5px; margin:0 0 2px; }
+  .sub { color:#8b8b98; font-size:13px; margin:0 0 16px; }
+  .summary { background:#18181c; border:1px solid #2e2e35; border-radius:12px; padding:12px; margin-bottom:14px; }
+  .summary-top { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:6px; }
+  .summary-label { font-size:12.5px; color:#8b8b98; margin-bottom:2px; }
+  .summary-value { font-size:20px; font-weight:700; letter-spacing:-0.5px; font-variant-numeric:tabular-nums; }
+  .summary-sub { font-size:12px; color:#8b8b98; margin-top:1px; font-variant-numeric:tabular-nums; }
+  .summary-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+  .summary-cell { background:#13131a; border-radius:8px; padding:10px 12px; }
   .summary-pl.pos { color:#34d399; } .summary-pl.neg { color:#f87171; }
   .fx-bar { display:flex; align-items:center; gap:6px; margin-top:14px; padding-top:14px; border-top:1px solid #26262d; font-size:12px; color:#8b8b98; }
   .fx-badge { background:#22222a; border:1px solid #38383f; border-radius:6px; padding:2px 8px; font-size:12px; color:#ededf0; font-variant-numeric:tabular-nums; }
   .fx-err { font-size:12px; color:#f87171; }
-  .card { background:#18181c; border:1px solid #2e2e35; border-radius:14px; padding:18px; margin-bottom:24px; }
-  .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
-  input, select { background:#09090b; border:1px solid #27272a; border-radius:9px; padding:9px 12px; font-size:14px; font-family:'Inter',sans-serif; color:#ededf0; width:100%; transition:border-color .15s; }
+  .card { background:#18181c; border:1px solid #2e2e35; border-radius:12px; padding:12px; margin-bottom:14px; }
+  .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
+  input, select { background:#09090b; border:1px solid #27272a; border-radius:8px; padding:8px 10px; font-size:14px; font-family:'Inter',sans-serif; color:#ededf0; width:100%; transition:border-color .15s; }
   input:focus, select:focus { outline:none; border-color:#6366f1; box-shadow:0 0 0 3px rgba(99,102,241,.15); }
   input::placeholder { color:#6b6b78; }
-  button.primary { display:inline-flex; align-items:center; gap:6px; background:#6366f1; color:#fff; border:none; border-radius:9px; padding:9px 16px; font-size:14px; font-family:'Inter',sans-serif; font-weight:600; cursor:pointer; transition:background .15s; }
+  button.primary { display:inline-flex; align-items:center; gap:6px; background:#6366f1; color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:13px; font-family:'Inter',sans-serif; font-weight:600; cursor:pointer; transition:background .15s; }
   button.primary:hover { background:#818cf8; }
   button.primary:disabled { opacity:.45; cursor:not-allowed; }
-  .filter { width:100%; margin-bottom:18px; }
+  .filter { width:100%; margin-bottom:12px; }
   .empty { color:#52525b; font-size:14px; padding:12px 0; }
-  .error { display:flex; align-items:center; gap:8px; background:#3f0e18; border:1px solid #7f1d1d; color:#fca5a5; font-size:13.5px; border-radius:10px; padding:10px 14px; margin-bottom:18px; }
+  .error { display:flex; align-items:center; gap:8px; background:#3f0e18; border:1px solid #7f1d1d; color:#fca5a5; font-size:13.5px; border-radius:10px; padding:10px 14px; margin-bottom:12px; }
 
-  #loginScreen { max-width:300px; margin:120px auto; text-align:center; }
+  #loginScreen { max-width:300px; margin:80px auto; text-align:center; }
   #loginScreen h1 { margin-bottom:6px; }
   #loginScreen .sub { margin-bottom:28px; }
-  #loginScreen input { margin:0 0 12px; text-align:center; letter-spacing:6px; font-size:22px; padding:12px; }
+  #loginScreen input { margin:0 0 12px; text-align:center; letter-spacing:6px; font-size:18px; padding:10px; }
   #loginScreen p.err { color:#f87171; font-size:13px; min-height:20px; margin-top:8px; }
   #app { display:none; }
-  #topbar { display:flex; justify-content:flex-end; margin-bottom:4px; }
+  #topbar { display:flex; justify-content:flex-end; margin-bottom:2px; }
   #logoutBtn { background:none; border:none; color:#6b6b78; font-size:13px; font-family:'Inter',sans-serif; cursor:pointer; padding:4px 0; }
   #logoutBtn:hover { color:#c4c4cc; }
 
   .group { border-bottom:1px solid #26262d; }
   .group:first-child { border-top:1px solid #26262d; }
-  .grow { display:flex; align-items:center; gap:14px; padding:14px 4px; cursor:pointer; user-select:none; }
+  .grow { display:flex; align-items:center; gap:10px; padding:10px 4px; cursor:pointer; user-select:none; }
   .grow:hover { background:#1a1a20; }
-  .badge { flex-shrink:0; width:48px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#fff; letter-spacing:.5px; }
+  .badge { flex-shrink:0; width:42px; height:30px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; letter-spacing:.3px; }
   .name { flex:1; min-width:0; }
-  .name .t { font-weight:700; font-size:15px; letter-spacing:-0.2px; }
+  .name .t { font-weight:700; font-size:14px; letter-spacing:-0.2px; }
   .name .qty { color:#8b8b98; font-size:12.5px; margin-top:2px; }
   .day-change.pos { color:#34d399; } .day-change.neg { color:#f87171; } .day-change.flat { color:#6b6b78; }
   .port-bar-wrap { height:3px; background:#26262d; border-radius:2px; margin-top:5px; width:100%; }
   .port-bar { height:3px; border-radius:2px; background:#6366f1; transition:width .3s; }
   .port-pct { font-size:11px; color:#6366f1; font-weight:600; margin-top:2px; }
-  .price { width:90px; text-align:right; font-size:15px; font-weight:600; font-variant-numeric:tabular-nums; }
-  .change { width:82px; text-align:right; font-size:13.5px; font-variant-numeric:tabular-nums; }
+  .price { width:76px; text-align:right; font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .change { width:72px; text-align:right; font-size:12px; font-variant-numeric:tabular-nums; }
   .change.pos { color:#34d399; } .change.neg { color:#f87171; } .change.flat { color:#6b6b78; }
   .pct { text-align:right; flex-shrink:0; }
-  .pct span { display:inline-block; font-size:12px; font-weight:700; padding:4px 8px; border-radius:6px; font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1.4; }
+  .pct span { display:inline-block; font-size:11px; font-weight:700; padding:3px 6px; border-radius:6px; font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1.4; }
   .pct.pos span { background:rgba(52,211,153,.15); color:#34d399; }
   .pct.neg span { background:rgba(248,113,113,.15); color:#f87171; }
   .pct.flat span { background:#26262d; color:#8b8b98; }
@@ -73,9 +76,9 @@
   .btn-refresh-all:hover { background:#2a2a38; }
   .btn-refresh-all:disabled { opacity:.45; cursor:not-allowed; }
 
-  .txn { display:flex; align-items:flex-start; justify-content:space-between; padding:9px 0; border-top:1px solid #26262d; gap:8px; }
+  .txn { display:flex; align-items:flex-start; justify-content:space-between; padding:7px 0; border-top:1px solid #26262d; gap:8px; }
   .txn:first-of-type { border-top:none; }
-  .txn-left { font-size:13.5px; flex:1; line-height:1.6; }
+  .txn-left { font-size:12.5px; flex:1; line-height:1.6; }
   .txn-profit { font-size:12px; font-weight:600; margin-left:6px; }
   .txn-profit.pos { color:#34d399; } .txn-profit.neg { color:#f87171; }
   .txn-actions { display:flex; gap:0; flex-shrink:0; margin-top:1px; }
@@ -136,6 +139,10 @@
         <div class="summary-label">Return</div>
         <div id="sum-pct" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
       </div>
+      <div class="summary-cell" style="grid-column:span 3">
+        <div class="summary-label">XIRR (annualized return on actual cash flows)</div>
+        <div id="sum-xirr" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
+      </div>
     </div>
     <div class="fx-bar">
       <span>USD/THB</span>
@@ -178,16 +185,14 @@ import {
 
 // === Replace with your values from Firebase Console > Project settings > Your apps ===
 const firebaseConfig = {
-  apiKey: "AIzaSyAi3cy0ueunppSDCDGSyKj7X72kO3NtRTE",
-  authDomain: "stock-record-6925a.firebaseapp.com",
-  projectId: "stock-record-6925a",
-  storageBucket: "stock-record-6925a.firebasestorage.app",
-  messagingSenderId: "495239740483",
-  appId: "1:495239740483:web:ab9546d55c937dc6ece8f6"
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID",
 };
-// Fixed email for the single account in Firebase Console > Authentication > Users
-// The UI only shows a PIN field — the email is never shown to the user
-const OWNER_EMAIL = "araikordai@mail.com";
+const OWNER_EMAIL = "YOUR_EMAIL";
 // ==================================================================================
 
 const app = initializeApp(firebaseConfig);
@@ -351,6 +356,26 @@ function toThb(value, ticker) {
   return fxRate ? value * fxRate : null;
 }
 
+function xirr(cashflows) {
+  // cashflows = [{amount, date}] โดย amount ติดลบ=จ่ายออก, บวก=รับเข้า
+  // ใช้ Newton-Raphson
+  const today = new Date();
+  const days = cashflows.map(cf => (new Date(cf.date) - new Date(cashflows[0].date)) / 86400000);
+  let r = 0.1;
+  for (let i = 0; i < 100; i++) {
+    let npv = 0, dnpv = 0;
+    for (let j = 0; j < cashflows.length; j++) {
+      const t = days[j] / 365;
+      npv  += cashflows[j].amount / Math.pow(1 + r, t);
+      dnpv -= t * cashflows[j].amount / Math.pow(1 + r, t + 1);
+    }
+    const r1 = r - npv / dnpv;
+    if (Math.abs(r1 - r) < 1e-7) return r1;
+    r = r1;
+  }
+  return r;
+}
+
 function renderSummary() {
   const sumEl = document.getElementById("summary");
   if (!entries.length) { sumEl.style.display = "none"; return; }
@@ -387,6 +412,36 @@ function renderSummary() {
   const fmt   = (n) => "฿" + Math.round(n).toLocaleString();
   const plCls = pl >= 0 ? "pos" : "neg";
   const plSign = pl >= 0 ? "+" : "";
+
+  // คำนวณ XIRR
+  // cash flows: ทุก transaction เป็น outflow (ซื้อ = -)  หรือ inflow (ขาย = +)
+  // terminal value = มูลค่าปัจจุบันทั้ง port (inflow วันนี้)
+  let xirrEl = document.getElementById("sum-xirr");
+  try {
+    const cashflows = [];
+    for (const e of entries) {
+      const amtThb = toThb(e.price * e.qty, e.ticker);
+      if (amtThb === null) continue;
+      cashflows.push({
+        date: e.date,
+        amount: e.action === "sell" ? amtThb : -amtThb,
+      });
+    }
+    // terminal: มูลค่าปัจจุบัน (inflow)
+    if (totalValue > 0 && cashflows.length > 0) {
+      cashflows.push({ date: new Date().toISOString().slice(0,10), amount: totalValue });
+      cashflows.sort((a,b) => a.date.localeCompare(b.date));
+      const rate = xirr(cashflows);
+      const xirrPct = (rate * 100).toFixed(2);
+      const xirrCls = rate >= 0 ? "pos" : "neg";
+      xirrEl.textContent = (rate >= 0 ? "+" : "") + xirrPct + "% per year";
+      xirrEl.className = "summary-pl " + xirrCls;
+    } else {
+      xirrEl.textContent = "—";
+    }
+  } catch {
+    xirrEl.textContent = "N/A";
+  }
 
   document.getElementById("sum-value").textContent = fmt(totalValue);
   document.getElementById("sum-value-sub").textContent = incomplete ? "* some positions missing price" : "";
