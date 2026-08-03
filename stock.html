@@ -22,8 +22,7 @@
   .summary-pl.pos { color:#34d399; } .summary-pl.neg { color:#f87171; }
   .fx-bar { display:flex; align-items:center; gap:6px; margin-top:14px; padding-top:14px; border-top:1px solid #26262d; font-size:12px; color:#8b8b98; }
   .fx-badge { background:#22222a; border:1px solid #38383f; border-radius:6px; padding:2px 8px; font-size:12px; color:#ededf0; font-variant-numeric:tabular-nums; }
-  .fx-refresh { background:none; border:none; color:#6366f1; cursor:pointer; font-size:12px; padding:0; font-family:'Inter',sans-serif; }
-  .fx-refresh:hover { color:#818cf8; }
+  .fx-err { font-size:12px; color:#f87171; }
   .card { background:#18181c; border:1px solid #2e2e35; border-radius:14px; padding:18px; margin-bottom:24px; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px; }
   input, select { background:#09090b; border:1px solid #27272a; border-radius:9px; padding:9px 12px; font-size:14px; font-family:'Inter',sans-serif; color:#ededf0; width:100%; transition:border-color .15s; }
@@ -70,13 +69,9 @@
   .chev.open { transform:rotate(90deg); }
 
   .details { padding:2px 4px 16px 62px; }
-  .setprice { display:flex; align-items:center; gap:8px; margin-bottom:12px; flex-wrap:wrap; }
-  .setprice input { width:116px; font-size:13.5px; }
-  .setprice button { background:#22222a; border:1px solid #38383f; color:#b4b4c0; border-radius:8px; padding:7px 11px; font-size:12.5px; font-family:'Inter',sans-serif; cursor:pointer; transition:background .12s; }
-  .setprice button:hover { background:#2a2a32; }
-  .setprice button:disabled { opacity:.4; cursor:not-allowed; }
-  .setprice label { font-size:12.5px; color:#71717a; }
-  .fetch-err { font-size:12px; color:#f87171; width:100%; }
+  .btn-refresh-all { display:inline-flex; align-items:center; gap:6px; background:#1f1f28; border:1px solid #3f3f52; color:#818cf8; border-radius:8px; padding:7px 14px; font-size:13px; font-family:'Inter',sans-serif; font-weight:600; cursor:pointer; transition:background .15s; }
+  .btn-refresh-all:hover { background:#2a2a38; }
+  .btn-refresh-all:disabled { opacity:.45; cursor:not-allowed; }
 
   .txn { display:flex; align-items:flex-start; justify-content:space-between; padding:9px 0; border-top:1px solid #26262d; gap:8px; }
   .txn:first-of-type { border-top:none; }
@@ -145,8 +140,9 @@
     <div class="fx-bar">
       <span>USD/THB</span>
       <span class="fx-badge" id="fx-rate">—</span>
-      <button class="fx-refresh" onclick="fetchFxRate()">↻ refresh</button>
-      <span id="fx-err" style="color:#f87171;margin-left:4px;"></span>
+      <span id="fx-err" class="fx-err" style="margin-left:4px;"></span>
+      <div style="flex:1"></div>
+      <button class="btn-refresh-all" id="btnRefreshAll" onclick="refreshAll()">↻ Refresh All</button>
     </div>
   </div>
 
@@ -231,11 +227,15 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
+let firstLoad = true;
+
 function subscribe() {
   fetchFxRate();
-  unsubEntries = onSnapshot(query(collection(db, "entries")), (snap) => {
+  unsubEntries = onSnapshot(query(collection(db, "entries")), async (snap) => {
     entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    setError(false); render();
+    setError(false);
+    if (firstLoad) { firstLoad = false; await refreshAll(); }
+    else { render(); }
   }, () => setError(true));
   unsubPrices = onSnapshot(query(collection(db, "prices")), (snap) => {
     prices = {};
@@ -243,6 +243,24 @@ function subscribe() {
     render();
   }, () => setError(true));
 }
+
+window.refreshAll = async function () {
+  const btn = document.getElementById("btnRefreshAll");
+  if (btn) { btn.disabled = true; btn.textContent = "Fetching…"; }
+  // หา unique tickers ที่ถือ (heldQty > 0)
+  const groups = {};
+  for (const e of entries) { if (!groups[e.ticker]) groups[e.ticker] = []; groups[e.ticker].push(e); }
+  const tickers = Object.keys(groups).filter(t => {
+    const bQty = groups[t].filter(x=>x.action==="buy").reduce((s,x)=>s+x.qty,0);
+    const sQty = groups[t].filter(x=>x.action==="sell").reduce((s,x)=>s+x.qty,0);
+    return bQty - sQty > 0;
+  });
+  await Promise.all([
+    fetchFxRate(),
+    ...tickers.map(t => fetchTickerPrice(t))
+  ]);
+  if (btn) { btn.disabled = false; btn.textContent = "↻ Refresh All"; }
+};
 
 function setError(v) { document.getElementById("errorBanner").style.display = v ? "flex" : "none"; }
 
@@ -263,25 +281,14 @@ window.deleteEntry = async function (id) {
   try { await deleteDoc(doc(db, "entries", id)); setError(false); } catch { setError(true); }
 };
 
-window.fetchPrice = async function (ticker) {
-  const btn = document.querySelector(`#sp-${CSS.escape(ticker)} button`);
-  const errEl = document.getElementById(`fe-${ticker}`);
-  const input = document.getElementById(`cp-${ticker}`);
-  errEl.textContent = ""; btn.disabled = true; btn.textContent = "…";
+async function fetchTickerPrice(ticker) {
   try {
     const res = await fetch(`/api/price?ticker=${encodeURIComponent(ticker)}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "Fetch failed");
-    input.value = data.price;
     await persistPrice(ticker, data.price, data.previousClose ?? null);
-  } catch (e) { errEl.textContent = e.message; }
-  finally { btn.disabled = false; btn.textContent = "↻ Fetch"; }
-};
-
-window.savePrice = async function (ticker) {
-  const val = parseFloat(document.getElementById(`cp-${ticker}`).value);
-  if (!isNaN(val)) await persistPrice(ticker, val, null);
-};
+  } catch (e) { console.warn(ticker, e.message); }
+}
 
 async function persistPrice(ticker, val, previousClose) {
   try {
@@ -422,9 +429,11 @@ function render() {
     const has = cur !== undefined && !isNaN(cur);
     const chgAbs = has && avgBuy > 0 ? cur - avgBuy : null;
     const chgPct = chgAbs !== null && avgBuy > 0 ? (chgAbs/avgBuy)*100 : null;
+    const plAbs  = chgAbs !== null && heldQty > 0 ? chgAbs * heldQty : null;
     const trend  = chgAbs === null ? "flat" : chgAbs > 0 ? "pos" : chgAbs < 0 ? "neg" : "flat";
 
-    const dayAbs = has && prevClose ? cur - prevClose : null;
+    const currSym = isThaiStock(ticker) ? "฿" : "$";
+    const fmtMoney = (n) => currSym + Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     const dayPct = dayAbs !== null && prevClose ? (dayAbs/prevClose)*100 : null;
     const dayTrend = dayAbs === null ? "flat" : dayAbs > 0 ? "pos" : dayAbs < 0 ? "neg" : "flat";
     const dayHtml = dayAbs !== null
@@ -450,25 +459,20 @@ function render() {
             ${portHtml}
           </div>
           <div class="price">${has ? cur.toLocaleString() : "—"}</div>
-          <div class="change ${trend}">${chgAbs===null ? "" : (chgAbs>=0?"+":"")+chgAbs.toLocaleString(undefined,{maximumFractionDigits:2})}</div>
+          <div class="change ${trend}">${plAbs===null ? "" : (plAbs>=0?"+":"-")+fmtMoney(plAbs)}</div>
           <div class="pct ${trend}">${chgPct===null ? "" : `<span>${chgPct>=0?"↑":"↓"} ${Math.abs(chgPct).toFixed(2)}%</span>`}</div>
           <div class="chev ${isOpen?"open":""}">▶</div>
         </div>
         ${isOpen ? `
         <div class="details">
-          <div class="setprice" id="sp-${ticker}">
-            <label>Current price</label>
-            <input id="cp-${ticker}" type="number" value="${has ? cur : ""}" placeholder="Manual">
-            <button onclick="fetchPrice('${ticker}')">↻ Fetch</button>
-            <button onclick="savePrice('${ticker}')">Save</button>
-            <span class="fetch-err" id="fe-${ticker}"></span>
-          </div>
           ${txns.map(t => {
             let profit = "";
             if (t.action==="buy" && has && t.price>0) {
               const pAbs = (cur-t.price)*t.qty;
               const pPct = ((cur-t.price)/t.price)*100;
-              profit = `<span class="txn-profit ${pAbs>=0?"pos":"neg"}">${pAbs>=0?"+":""}${pAbs.toLocaleString(undefined,{maximumFractionDigits:2})} (${pPct>=0?"+":""}${pPct.toFixed(2)}%)</span>`;
+              const tSym = isThaiStock(ticker) ? "฿" : "$";
+              const pFmt = tSym + Math.abs(pAbs).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+              profit = `<span class="txn-profit ${pAbs>=0?"pos":"neg"}">${pAbs>=0?"+":"-"}${pFmt} (${pPct>=0?"+":""}${pPct.toFixed(2)}%)</span>`;
             }
             if (editingId === t.id) return `
               <div class="txn"><div class="txn-left" style="width:100%">
