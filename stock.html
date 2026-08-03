@@ -412,7 +412,9 @@ function render() {
     const sQty = grp.filter(x => x.action==="sell").reduce((s,x) => s+x.qty, 0);
     const held = bQty - sQty;
     const p = prices[t]?.price;
-    return sum + (p && held > 0 ? held * p : 0);
+    if (!p || held <= 0) return sum;
+    const valThb = isThaiStock(t) ? held * p : (fxRate ? held * p * fxRate : 0);
+    return sum + valThb;
   }, 0);
 
   list.innerHTML = tickers.map(ticker => {
@@ -439,8 +441,10 @@ function render() {
       ? `<span class="day-change ${dayTrend}" style="font-size:12.5px;font-weight:600;">1D ${dayAbs>=0?"+":""}${dayAbs.toLocaleString(undefined,{maximumFractionDigits:2})} (${dayPct>=0?"+":""}${dayPct.toFixed(2)}%)</span>`
       : "";
 
-    const portValue = has && heldQty > 0 ? heldQty * cur : 0;
-    const portWeight = totalPortValue > 0 && portValue > 0 ? (portValue / totalPortValue) * 100 : null;
+    const portValueThb = has && heldQty > 0
+      ? (isThaiStock(ticker) ? heldQty * cur : (fxRate ? heldQty * cur * fxRate : 0))
+      : 0;
+    const portWeight = totalPortValue > 0 && portValueThb > 0 ? (portValueThb / totalPortValue) * 100 : null;
     const portHtml = portWeight !== null
       ? `<div class="port-bar-wrap"><div class="port-bar" style="width:${Math.min(portWeight,100).toFixed(1)}%"></div></div>
          <div class="port-pct">${portWeight.toFixed(1)}% of portfolio</div>`
