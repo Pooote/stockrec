@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Import Transactions</title>
+<style>
+  body { margin:0; background:#09090b; color:#e4e4e7; font-family:-apple-system,sans-serif; padding:32px; }
+  h1 { font-size:20px; margin-bottom:8px; }
+  .sub { color:#71717a; font-size:13px; margin-bottom:24px; }
+  button { background:#6366f1; color:#fff; border:none; border-radius:8px; padding:10px 20px; font-size:14px; cursor:pointer; }
+  button:disabled { opacity:.5; cursor:not-allowed; }
+  #log { margin-top:20px; font-size:12px; font-family:monospace; color:#a1a1aa; white-space:pre-wrap; max-height:500px; overflow-y:auto; background:#18181b; border-radius:8px; padding:12px; }
+  .ok { color:#34d399; } .err { color:#f87171; }
+</style>
+</head>
+<body>
+<h1>Import Transactions</h1>
+<p class="sub">คลิกปุ่มเพื่อ import 107 transactions เข้า Firestore — ทำได้ครั้งเดียว แล้วลบไฟล์นี้ทิ้ง</p>
+<button id="btn" onclick="run()">▶ Start Import</button>
+<div id="log"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+cconst firebaseConfig = {
+  apiKey: "AIzaSyAi3cy0ueunppSDCDGSyKj7X72kO3NtRTE",
+  authDomain: "stock-record-6925a.firebaseapp.com",
+  projectId: "stock-record-6925a",
+  storageBucket: "stock-record-6925a.firebasestorage.app",
+  messagingSenderId: "495239740483",
+  appId: "1:495239740483:web:ab9546d55c937dc6ece8f6"
+};
+
+const OWNER_EMAIL = "araikordai@mail.com";
+const OWNER_PIN   = "123456"; // ใส่ PIN จริงของคุณ
+
+const transactions = [
+  {date:"2026-07-30",ticker:"NVDA",  action:"buy", price:193.13, qty:0.3618805},
+  {date:"2026-06-09",ticker:"NOW",   action:"buy", price:105.28, qty:0.4741641},
+  {date:"2026-06-09",ticker:"TCOM",  action:"buy", price:48.13,  qty:1.0371909},
+  {date:"2026-06-09",ticker:"MSFT",  action:"buy", price:398.00, qty:0.0329145},
+  {date:"2026-06-09",ticker:"QQQM",  action:"buy", price:288.93, qty:0.6922091},
+  {date:"2026-05-26",ticker:"INDA",  action:"buy", price:48.69,  qty:1.4354076},
+  {date:"2026-05-19",ticker:"SE",    action:"buy", price:86.37,  qty:1.2735903},
+  {date:"2026-04-29",ticker:"META",  action:"buy", price:619.24, qty:0.1614882},
+  {date:"2026-04-29",ticker:"GRAB",  action:"buy", price:3.82,   qty:13.052356},
+  {date:"2026-03-26",ticker:"JEPQ",  action:"buy", price:54.88,  qty:1.1093294},
+  {date:"2026-03-26",ticker:"IVW",   action:"buy", price:111.23, qty:0.8975995},
+  {date:"2026-03-20",ticker:"QQQM",  action:"buy", price:243.08, qty:0.4107289},
+  {date:"2026-03-20",ticker:"JEPQ",  action:"buy", price:56.52,  qty:0.5299009},
+  {date:"2026-03-20",ticker:"CQQQ",  action:"buy", price:46.33,  qty:1.5085257},
+  {date:"2026-03-15",ticker:"IVW",   action:"buy", price:117.96, qty:0.8739403},
+  {date:"2026-02-04",ticker:"AMD",   action:"buy", price:201.27, qty:0.248025},
+  {date:"2026-02-04",ticker:"TSM",   action:"buy", price:322.80, qty:0.1855638},
+  {date:"2026-02-04",ticker:"JEPQ",  action:"buy", price:57.26,  qty:0.1000698},
+  {date:"2026-02-03",ticker:"CRGY",  action:"sell",price:9.73,   qty:0.2009029},
+  {date:"2026-02-03",ticker:"F",     action:"sell",price:13.80,  qty:0.1198514},
+  {date:"2026-02-03",ticker:"DUOL",  action:"buy", price:119.53, qty:0.4176357},
+  {date:"2026-02-03",ticker:"SE",    action:"buy", price:107.63, qty:0.9276224},
+  {date:"2026-02-02",ticker:"CQQQ",  action:"buy", price:54.52,  qty:2.7512839},
+  {date:"2026-01-29",ticker:"TSM",   action:"buy", price:337.28, qty:0.1628024},
+  {date:"2026-01-29",ticker:"MSFT",  action:"buy", price:439.07, qty:0.1023299},
+  {date:"2026-01-20",ticker:"NVDA",  action:"buy", price:178.96, qty:0.6471278},
+  {date:"2026-01-15",ticker:"GRAB",  action:"buy", price:4.58,   qty:10.8908296},
+  {date:"2026-01-14",ticker:"TCOM",  action:"buy", price:60.96,  qty:0.8188976},
+  {date:"2026-01-13",ticker:"MSFT",  action:"buy", price:466.54, qty:0.278647},
+  {date:"2026-01-13",ticker:"AVGO",  action:"buy", price:349.00, qty:0.06553},
+  {date:"2025-12-15",ticker:"AMZN",  action:"buy", price:222.39, qty:0.2708327},
+  {date:"2025-11-20",ticker:"QQQM",  action:"buy", price:241.58, qty:0.1363937},
+  {date:"2025-11-20",ticker:"AMD",   action:"buy", price:208.80, qty:0.2629789},
+  {date:"2025-11-20",ticker:"JEPQ",  action:"buy", price:56.00,  qty:0.5712499},
+  {date:"2025-11-13",ticker:"IVW",   action:"buy", price:119.19, qty:0.8376541},
+  {date:"2025-11-06",ticker:"DUOL",  action:"buy", price:191.00, qty:0.2404712},
+  {date:"2025-11-04",ticker:"SE",    action:"buy", price:156.16, qty:0.2877177},
+  {date:"2025-11-04",ticker:"QQQM",  action:"buy", price:254.64, qty:0.2945334},
+  {date:"2025-11-04",ticker:"META",  action:"buy", price:631.91, qty:0.1106011},
+  {date:"2025-10-26",ticker:"KEEL",  action:"buy", price:4.61,   qty:2},
+  {date:"2025-10-20",ticker:"GRAB",  action:"buy", price:5.67,   qty:20.2433862},
+  {date:"2025-10-20",ticker:"TCOM",  action:"buy", price:71.11,  qty:0.9828434},
+  {date:"2025-10-20",ticker:"VNM",   action:"buy", price:18.20,  qty:6.5934065},
+  {date:"2025-10-20",ticker:"CQQQ",  action:"buy", price:55.27,  qty:0.9229238},
+  {date:"2025-09-29",ticker:"CRGY",  action:"buy", price:8.86,   qty:0.2009029},
+  {date:"2025-09-29",ticker:"NVDA",  action:"buy", price:186.91, qty:0.0082924},
+  {date:"2025-09-05",ticker:"GRAB",  action:"buy", price:5.11,   qty:0.6057053},
+  {date:"2025-09-05",ticker:"GOOGL", action:"buy", price:234.63, qty:0.0066061},
+  {date:"2025-09-02",ticker:"CRWD",  action:"buy", price:103.11, qty:0.6778524},
+  {date:"2025-09-02",ticker:"IVW",   action:"buy", price:114.74, qty:1.3073034},
+  {date:"2025-08-19",ticker:"IVW",   action:"buy", price:113.92, qty:0.8764044},
+  {date:"2025-08-19",ticker:"NVDA",  action:"buy", price:171.63, qty:0.319917},
+  {date:"2025-08-14",ticker:"JEPQ",  action:"buy", price:55.74,  qty:1.1259596},
+  {date:"2025-08-12",ticker:"NBIS",  action:"sell",price:74.30,  qty:0.8290768},
+  {date:"2025-07-31",ticker:"IVW",   action:"buy", price:112.12, qty:0.8051512},
+  {date:"2025-07-31",ticker:"QQQM",  action:"buy", price:229.10, qty:0.1307255},
+  {date:"2025-07-31",ticker:"AMZN",  action:"buy", price:217.95, qty:0.1374155},
+  {date:"2025-07-31",ticker:"VNM",   action:"buy", price:15.99,  qty:1.2490617},
+  {date:"2025-07-13",ticker:"JEPQ",  action:"buy", price:54.34,  qty:0.0780157},
+  {date:"2025-07-13",ticker:"DUOL",  action:"buy", price:374.38, qty:0.1335541},
+  {date:"2025-07-03",ticker:"F",     action:"buy", price:11.84,  qty:0.1198514},
+  {date:"2025-07-01",ticker:"MSFT",  action:"buy", price:491.70, qty:0.0028878},
+  {date:"2025-06-12",ticker:"V",     action:"buy", price:354.05, qty:0.5639567},
+  {date:"2025-06-12",ticker:"CQQQ",  action:"buy", price:42.65,  qty:4.6886846},
+  {date:"2025-06-12",ticker:"VNM",   action:"buy", price:13.10,  qty:2.284076},
+  {date:"2025-06-12",ticker:"NBIS",  action:"buy", price:48.16,  qty:0.8290768},
+  {date:"2025-06-12",ticker:"AMD",   action:"buy", price:115.99, qty:0.8606479},
+  {date:"2025-06-12",ticker:"JEPQ",  action:"buy", price:52.78,  qty:0.94548},
+  {date:"2025-06-12",ticker:"INDA",  action:"buy", price:54.11,  qty:0.5532355},
+  {date:"2025-05-15",ticker:"KHC",   action:"buy", price:26.60,  qty:1.7154135},
+  {date:"2025-05-15",ticker:"CQQQ",  action:"buy", price:42.76,  qty:4.7394761},
+  {date:"2025-04-20",ticker:"IVW",   action:"buy", price:86.38,  qty:2.3150918},
+  {date:"2025-04-20",ticker:"INDA",  action:"buy", price:52.93,  qty:0.2829725},
+  {date:"2025-04-20",ticker:"JEPQ",  action:"buy", price:47.77,  qty:1.253715},
+  {date:"2025-04-20",ticker:"VNM",   action:"buy", price:11.49,  qty:1.3028352},
+  {date:"2025-04-20",ticker:"CQQQ",  action:"buy", price:39.90,  qty:1.2509397},
+  {date:"2025-03-27",ticker:"VNM",   action:"buy", price:12.45,  qty:1.4448547},
+  {date:"2025-03-26",ticker:"CQQQ",  action:"buy", price:45.48,  qty:0.6446789},
+  {date:"2025-03-26",ticker:"INDA",  action:"buy", price:51.63,  qty:0.2838994},
+  {date:"2025-03-26",ticker:"QQQM",  action:"buy", price:201.35, qty:0.0728063},
+  {date:"2025-03-26",ticker:"NVDA",  action:"buy", price:115.31, qty:0.2543401},
+  {date:"2025-03-26",ticker:"JEPQ",  action:"buy", price:52.88,  qty:0.834972},
+  {date:"2025-03-26",ticker:"IVW",   action:"buy", price:96.58,  qty:0.3035636},
+  {date:"2025-03-04",ticker:"IVW",   action:"buy", price:97.91,  qty:0.66258536},
+  {date:"2025-03-04",ticker:"AMZN",  action:"buy", price:204.79, qty:0.488305},
+  {date:"2025-02-27",ticker:"CQQQ",  action:"buy", price:45.55,  qty:0.4383615},
+  {date:"2025-02-26",ticker:"AMZN",  action:"buy", price:217.08, qty:0.0065412},
+  {date:"2025-02-25",ticker:"INDA",  action:"buy", price:49.14,  qty:0.2397329},
+  {date:"2025-02-25",ticker:"VNM",   action:"buy", price:11.96,  qty:0.9859508},
+  {date:"2025-02-25",ticker:"CQQQ",  action:"buy", price:48.65,  qty:0.7270397},
+  {date:"2025-02-23",ticker:"IVW",   action:"buy", price:103.95, qty:0.4802308},
+  {date:"2025-02-23",ticker:"QQQM",  action:"buy", price:217.33, qty:0.2296967},
+  {date:"2025-02-05",ticker:"GOOGL", action:"buy", price:190.15, qty:0.3369338},
+  {date:"2025-01-27",ticker:"TSM",   action:"buy", price:195.85, qty:0.1274444},
+  {date:"2025-01-27",ticker:"ASML",  action:"buy", price:678.80, qty:0.0220683},
+  {date:"2025-01-27",ticker:"NVDA",  action:"buy", price:121.86, qty:0.2048252},
+  {date:"2025-01-15",ticker:"AMZN",  action:"buy", price:222.92, qty:0.3359919},
+  {date:"2024-12-31",ticker:"ASML",  action:"buy", price:705.00, qty:0.1078014},
+  {date:"2024-12-26",ticker:"V",     action:"buy", price:318.26, qty:0.2047086},
+  {date:"2024-12-16",ticker:"DIS",   action:"buy", price:111.36, qty:0.4034662},
+  {date:"2024-10-08",ticker:"TSM",   action:"buy", price:187.80, qty:0.4748136},
+  {date:"2024-09-28",ticker:"GOOGL", action:"buy", price:157.88, qty:0.3451341},
+  {date:"2024-07-17",ticker:"QQQ",   action:"buy", price:502.63, qty:0.235102},
+  {date:"2024-07-17",ticker:"NVDA",  action:"buy", price:125.15, qty:0.6791826},
+  {date:"2024-03-11",ticker:"AAPL",  action:"buy", price:173.11, qty:0.0082029},
+  {date:"2024-03-07",ticker:"IVW",   action:"buy", price:84.00,  qty:1.3522404},
+  {date:"2023-10-11",ticker:"LH.BK", action:"buy", price:7.58,   qty:600},
+  {date:"2023-09-14",ticker:"TDEX.BK",action:"buy",price:8.91,   qty:500},
+  {date:"2023-07-06",ticker:"SAT.BK",action:"buy", price:17.57,  qty:400},
+];
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+function log(msg, cls="") {
+  const el = document.getElementById("log");
+  el.innerHTML += `<span class="${cls}">${msg}</span>\n`;
+  el.scrollTop = el.scrollHeight;
+}
+
+window.run = async function () {
+  const btn = document.getElementById("btn");
+  btn.disabled = true;
+  btn.textContent = "Importing…";
+  log("Signing in…");
+  try {
+    await signInWithEmailAndPassword(auth, OWNER_EMAIL, OWNER_PIN);
+    log("✓ Signed in", "ok");
+  } catch (e) {
+    log("✗ Sign in failed: " + e.message, "err");
+    btn.disabled = false; return;
+  }
+
+  let ok = 0, fail = 0;
+  for (const t of transactions) {
+    try {
+      await addDoc(collection(db, "entries"), {
+        ticker: t.ticker,
+        action: t.action,
+        price:  t.price,
+        qty:    t.qty,
+        date:   t.date,
+        note:   "",
+      });
+      log(`✓ ${t.date} ${t.action.toUpperCase()} ${t.ticker} ${t.qty} @ ${t.price}`, "ok");
+      ok++;
+    } catch (e) {
+      log(`✗ ${t.ticker} ${t.date}: ${e.message}`, "err");
+      fail++;
+    }
+    await new Promise(r => setTimeout(r, 80)); // throttle
+  }
+  log(`\nDone: ${ok} imported, ${fail} failed`);
+  btn.textContent = "Done";
+};
+</script>
+</body>
+</html>
