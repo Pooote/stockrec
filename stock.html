@@ -50,21 +50,21 @@
 
   .group { border-bottom:1px solid #26262d; }
   .group:first-child { border-top:1px solid #26262d; }
-  .grow { display:flex; align-items:center; gap:10px; padding:10px 4px; cursor:pointer; user-select:none; }
+  .grow { display:flex; align-items:center; gap:8px; padding:10px 6px; cursor:pointer; user-select:none; }
   .grow:hover { background:#1a1a20; }
-  .badge { flex-shrink:0; width:42px; height:30px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; letter-spacing:.3px; }
+  .badge { flex-shrink:0; width:38px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#fff; letter-spacing:.3px; }
   .name { flex:1; min-width:0; }
-  .name .t { font-weight:700; font-size:14px; letter-spacing:-0.2px; }
-  .name .qty { color:#8b8b98; font-size:12.5px; margin-top:2px; }
+  .name .t { font-weight:700; font-size:13px; letter-spacing:-0.2px; }
+  .name .qty { color:#8b8b98; font-size:11px; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .day-change.pos { color:#34d399; } .day-change.neg { color:#f87171; } .day-change.flat { color:#6b6b78; }
   .port-bar-wrap { height:3px; background:#26262d; border-radius:2px; margin-top:5px; width:100%; }
   .port-bar { height:3px; border-radius:2px; background:#6366f1; transition:width .3s; }
-  .port-pct { font-size:11px; color:#6366f1; font-weight:600; margin-top:2px; }
-  .price { width:76px; text-align:right; font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
-  .change { width:72px; text-align:right; font-size:12px; font-variant-numeric:tabular-nums; }
+  .port-pct { font-size:10px; color:#6366f1; font-weight:600; margin-top:1px; }
+  .price { width:64px; text-align:right; font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
+  .change { width:68px; text-align:right; font-size:11.5px; font-variant-numeric:tabular-nums; }
   .change.pos { color:#34d399; } .change.neg { color:#f87171; } .change.flat { color:#6b6b78; }
   .pct { text-align:right; flex-shrink:0; }
-  .pct span { display:inline-block; font-size:11px; font-weight:700; padding:3px 6px; border-radius:6px; font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1.4; }
+  .pct span { display:inline-block; font-size:11px; font-weight:700; padding:2px 5px; border-radius:6px; font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1.4; }
   .pct.pos span { background:rgba(52,211,153,.15); color:#34d399; }
   .pct.neg span { background:rgba(248,113,113,.15); color:#f87171; }
   .pct.flat span { background:#26262d; color:#8b8b98; }
@@ -98,6 +98,21 @@
   .tag.sell { background:rgba(248,113,113,.15); color:#f87171; }
   .tag.watch { background:rgba(251,191,36,.1); color:#fbbf24; }
   .txn-meta { color:#8b8b98; }
+
+  @media (max-width: 430px) {
+    .change { display: none; }
+    .grow { gap: 6px; padding: 9px 4px; }
+    .price { width: 58px; font-size: 12px; }
+    .pct { width: auto; }
+    .badge { width: 34px; height: 26px; font-size: 9px; }
+    .name .t { font-size: 13px; }
+    .name .qty { font-size: 10.5px; }
+    .summary-grid { grid-template-columns: 1fr 1fr; }
+    .summary-grid .summary-cell:last-child { grid-column: span 2; }
+    h1 { font-size: 18px; }
+    .summary-value { font-size: 22px !important; }
+    .details { padding: 4px 4px 12px 42px; }
+  }
 </style>
 </head>
 <body>
@@ -514,8 +529,7 @@ function render() {
           <div class="badge" style="background:${colorFor(ticker)}">${ticker.slice(0,4)}</div>
           <div class="name">
             <div class="t">${ticker}</div>
-            <div class="qty">Holding ${heldQty.toLocaleString()} shares${avgBuy ? " · avg cost " + avgBuy.toLocaleString(undefined,{maximumFractionDigits:2}) : ""}</div>
-            ${dayHtml ? `<div>${dayHtml}</div>` : ""}
+            <div class="qty">Holding ${heldQty.toLocaleString()} sh · avg ${avgBuy ? avgBuy.toLocaleString(undefined,{maximumFractionDigits:2}) : "—"}${dayHtml ? " " + dayHtml.replace('<span class','<span style="display:inline" class') : ""}</div>
             ${portHtml}
           </div>
           <div class="price">${has ? cur.toLocaleString() : "—"}</div>
