@@ -479,6 +479,7 @@ function renderSummary() {
   document.getElementById("sum-pct").className = "summary-pl " + plCls;
 }
 
+window.render = render;
 function render() {
   const filterVal = document.getElementById("filter").value.trim().toUpperCase();
   const groups = groupByTicker(entries.filter(e => e.ticker.includes(filterVal)));
