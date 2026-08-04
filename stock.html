@@ -103,26 +103,21 @@
   .txn-meta { color:#8b8b98; }
 
   @media (max-width: 480px) {
-    /* grow: 2-row layout */
-    .grow { flex-wrap: wrap; gap: 4px 8px; padding: 10px 4px; align-items: flex-start; }
-    /* row 1: badge + name + spacer + price + pct + chev */
-    .badge { width: 36px; height: 26px; font-size: 9px; order: 1; align-self: center; }
+    .grow { flex-wrap: wrap; gap: 2px 6px; padding: 10px 4px; align-items: center; }
+    .badge { order: 1; width: 34px; height: 26px; font-size: 9px; flex-shrink:0; }
     .name { order: 2; flex: 1; min-width: 0; }
     .name .t { font-size: 13px; }
-    .price { order: 3; width: auto; min-width: 56px; font-size: 13px; align-self: center; }
-    .pct { order: 4; width: auto; align-self: center; }
-    .chev { order: 5; align-self: center; }
-    /* row 2: change (profit) full width under badge */
-    .change { order: 6; width: 100%; text-align: left; font-size: 11.5px; padding-left: 44px; margin-top: -2px; }
-    /* name qty: holding + 1D */
     .name .qty { font-size: 10.5px; white-space: normal; }
-    /* summary */
+    .price-col { order: 3; align-items: flex-end; }
+    .price { font-size: 13px; }
+    .pl-sub { font-size: 10px; }
+    .pct { order: 4; }
+    .chev { order: 5; }
     .summary-grid { grid-template-columns: 1fr 1fr; }
     .summary-grid .summary-cell:last-child { grid-column: span 2; }
     h1 { font-size: 18px; }
     .summary-value { font-size: 20px !important; }
-    .details { padding: 4px 4px 12px 44px; }
-    .port-pct { padding-left: 0; }
+    .details { padding: 4px 4px 12px 40px; }
   }
 </style>
 </head>
@@ -441,32 +436,38 @@ function renderSummary() {
   const plCls = pl >= 0 ? "pos" : "neg";
   const plSign = pl >= 0 ? "+" : "";
 
-  // คำนวณ XIRR — ราคาใน entries ทั้งหมดเป็น THB อยู่แล้ว
+  // คำนวณ XIRR
+  // หุ้นไทย (.BK) ราคา THB, หุ้นต่างชาติ ราคา USD → แปลงด้วย fxRate ปัจจุบัน
   let xirrEl = document.getElementById("sum-xirr");
-  try {
-    const cashflows = [];
-    for (const e of entries) {
-      const amt = e.price * e.qty; // THB ทุกตัว
-      if (!amt) continue;
-      cashflows.push({
-        date: e.date,
-        amount: e.action === "sell" ? amt : -amt,
-      });
+  if (!fxRate) {
+    xirrEl.textContent = "Need FX rate — click Refresh All";
+    xirrEl.className = "summary-pl flat";
+  } else {
+    try {
+      const cashflows = [];
+      for (const e of entries) {
+        const rawAmt = e.price * e.qty;
+        const amtThb = isThaiStock(e.ticker) ? rawAmt : rawAmt * fxRate;
+        if (!amtThb) continue;
+        cashflows.push({
+          date: e.date,
+          amount: e.action === "sell" ? amtThb : -amtThb,
+        });
+      }
+      if (totalValue > 0 && cashflows.length > 0) {
+        cashflows.push({ date: new Date().toISOString().slice(0,10), amount: totalValue });
+        cashflows.sort((a,b) => a.date.localeCompare(b.date));
+        const rate = xirr(cashflows);
+        if (isNaN(rate) || !isFinite(rate)) throw new Error("no convergence");
+        const xirrCls = rate >= 0 ? "pos" : "neg";
+        xirrEl.textContent = (rate >= 0 ? "+" : "") + (rate * 100).toFixed(2) + "% / year";
+        xirrEl.className = "summary-pl " + xirrCls;
+      } else {
+        xirrEl.textContent = "—";
+      }
+    } catch {
+      xirrEl.textContent = "N/A (not enough data)";
     }
-    // terminal: มูลค่าปัจจุบัน (inflow)
-    if (totalValue > 0 && cashflows.length > 0) {
-      cashflows.push({ date: new Date().toISOString().slice(0,10), amount: totalValue });
-      cashflows.sort((a,b) => a.date.localeCompare(b.date));
-      const rate = xirr(cashflows);
-      const xirrPct = (rate * 100).toFixed(2);
-      const xirrCls = rate >= 0 ? "pos" : "neg";
-      xirrEl.textContent = (rate >= 0 ? "+" : "") + xirrPct + "% per year";
-      xirrEl.className = "summary-pl " + xirrCls;
-    } else {
-      xirrEl.textContent = "—";
-    }
-  } catch {
-    xirrEl.textContent = "N/A";
   }
 
   document.getElementById("sum-value").textContent = fmt(totalValue);
