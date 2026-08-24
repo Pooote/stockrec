@@ -147,7 +147,7 @@
         <div class="summary-sub" id="sum-value-sub"></div>
       </div>
     </div>
-    <div class="summary-grid">
+    <div class="summary-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
       <div class="summary-cell">
         <div class="summary-label">Total Cost</div>
         <div id="sum-cost" style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;">—</div>
@@ -160,7 +160,12 @@
         <div class="summary-label">Return</div>
         <div id="sum-pct" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
       </div>
-      <div class="summary-cell" style="grid-column:span 3">
+      <div class="summary-cell">
+        <div class="summary-label">1D Change</div>
+        <div id="sum-day-change" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
+        <div id="sum-day-pct" class="summary-sub"></div>
+      </div>
+      <div class="summary-cell" style="grid-column:1 / -1">
         <div class="summary-label">XIRR (annualized return on actual cash flows)</div>
         <div id="sum-xirr" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
       </div>
@@ -404,7 +409,9 @@ function renderSummary() {
   if (!entries.length) { sumEl.style.display = "none"; return; }
   sumEl.style.display = "block";
 
-  let totalValue = 0, totalCost = 0, incomplete = false;
+  let totalValue = 0, totalCost = 0;
+  let totalPrevValue = 0, totalDayChange = 0;
+  let incomplete = false;
 
   // group entries by ticker
   const groups = {};
@@ -428,10 +435,33 @@ function renderSummary() {
     if (val === null || cost === null) { incomplete = true; continue; }
     totalValue += val;
     totalCost  += cost;
+
+    // Whole-portfolio 1-day change based on each stock's previous close.
+    // Foreign stocks are converted to THB using the current USD/THB rate.
+    if (prevClose !== null && prevClose > 0) {
+      const prevVal = toThb(heldQty * prevClose, ticker);
+      const dayChg  = toThb(heldQty * (cur - prevClose), ticker);
+
+      if (prevVal !== null && dayChg !== null) {
+        totalPrevValue += prevVal;
+        totalDayChange += dayChg;
+      }
+    }
   }
 
   const pl    = totalValue - totalCost;
   const plPct = totalCost > 0 ? (pl / totalCost) * 100 : 0;
+
+  const dayPct = totalPrevValue > 0
+    ? (totalDayChange / totalPrevValue) * 100
+    : null;
+  const dayCls = totalDayChange > 0
+    ? "pos"
+    : totalDayChange < 0
+      ? "neg"
+      : "flat";
+  const daySign = totalDayChange > 0 ? "+" : "";
+
   const fmt   = (n) => "฿" + Math.round(n).toLocaleString();
   const plCls = pl >= 0 ? "pos" : "neg";
   const plSign = pl >= 0 ? "+" : "";
@@ -477,6 +507,20 @@ function renderSummary() {
   document.getElementById("sum-pl").className = "summary-pl " + plCls;
   document.getElementById("sum-pct").textContent = plSign + plPct.toFixed(2) + "%";
   document.getElementById("sum-pct").className = "summary-pl " + plCls;
+
+  const dayEl = document.getElementById("sum-day-change");
+  const dayPctEl = document.getElementById("sum-day-pct");
+
+  if (totalPrevValue > 0) {
+    dayEl.textContent = daySign + fmt(totalDayChange);
+    dayEl.className = "summary-pl " + dayCls;
+    dayPctEl.textContent =
+      (dayPct >= 0 ? "+" : "") + dayPct.toFixed(2) + "%";
+  } else {
+    dayEl.textContent = "—";
+    dayEl.className = "summary-pl flat";
+    dayPctEl.textContent = "Previous close unavailable";
+  }
 }
 
 window.render = render;
