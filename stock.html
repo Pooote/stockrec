@@ -147,7 +147,7 @@
         <div class="summary-sub" id="sum-value-sub"></div>
       </div>
     </div>
-    <div class="summary-grid">
+    <div class="summary-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
       <div class="summary-cell">
         <div class="summary-label">Total Cost</div>
         <div id="sum-cost" style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;">—</div>
@@ -163,13 +163,25 @@
       <div class="summary-cell">
         <div class="summary-label">1D Change</div>
         <div id="sum-day-change" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
-        <div id="sum-day-pct" class="summary-sub">—</div>
+        <div id="sum-day-pct" class="summary-sub"></div>
       </div>
       <div class="summary-cell" style="grid-column:1 / -1">
         <div class="summary-label">XIRR (annualized return on actual cash flows)</div>
         <div id="sum-xirr" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
       </div>
     </div>
+
+    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #26262d;">
+      <div class="summary-label">Performance</div>
+      <div id="performance-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px;">
+        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">1D</div><div id="perf-1d" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
+        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">1W</div><div id="perf-1w" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
+        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">1M</div><div id="perf-1m" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
+        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">1Y</div><div id="perf-1y" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
+        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">ALL</div><div id="perf-all" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
+      </div>
+    </div>
+
     <div class="fx-bar">
       <span>USD/THB</span>
       <span class="fx-badge" id="fx-rate">—</span>
@@ -316,20 +328,9 @@ async function fetchTickerPrice(ticker) {
   try {
     const res = await fetch(`/api/price?ticker=${encodeURIComponent(ticker)}`);
     const data = await res.json();
-
-    if (!res.ok) {
-      throw new Error(data.error || "Fetch failed");
-    }
-
-    await persistPrice(
-      ticker,
-      data.price,
-      data.previousClose ?? null
-    );
-  } catch (e) {
-    console.error(`Price fetch failed: ${ticker}`, e);
-    setError(true);
-  }
+    if (!res.ok) throw new Error(data.error || "Fetch failed");
+    await persistPrice(ticker, data.price, data.previousClose ?? null);
+  } catch (e) { console.warn(ticker, e.message); }
 }
 
 async function persistPrice(ticker, val, previousClose) {
@@ -382,9 +383,7 @@ window.fetchFxRate = async function () {
     document.getElementById("fx-rate").textContent = fxRate.toFixed(2);
     renderSummary();
   } catch (e) {
-    console.error("FX fetch failed:", e);
-    document.getElementById("fx-err").textContent =
-      e.message || "fetch failed";
+    document.getElementById("fx-err").textContent = "fetch failed";
   }
 };
 
@@ -417,6 +416,118 @@ function xirr(cashflows) {
   return r;
 }
 
+async function fetchHistory(ticker, range = "max") {
+  const res = await fetch(`/api/history?ticker=${encodeURIComponent(ticker)}&range=${range}`);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `History fetch failed: ${ticker}`);
+  return data;
+}
+
+function historicalCloseBefore(rows, targetDate) {
+  if (!rows?.length) return null;
+  const target = targetDate.getTime();
+  let best = null;
+
+  for (const row of rows) {
+    const ts = new Date(row.date).getTime();
+    if (ts <= target && row.close != null) best = row.close;
+  }
+  return best;
+}
+
+async function renderPerformance() {
+  const ids = {
+    "1d": document.getElementById("perf-1d"),
+    "1w": document.getElementById("perf-1w"),
+    "1m": document.getElementById("perf-1m"),
+    "1y": document.getElementById("perf-1y"),
+    "all": document.getElementById("perf-all")
+  };
+
+  if (!Object.values(ids).every(Boolean)) return;
+
+  const groups = groupByTicker(entries);
+  const tickers = Object.keys(groups).filter(t => {
+    const buyQty = groups[t].filter(x => x.action === "buy").reduce((s,x) => s + x.qty, 0);
+    const sellQty = groups[t].filter(x => x.action === "sell").reduce((s,x) => s + x.qty, 0);
+    return buyQty - sellQty > 0;
+  });
+
+  if (!tickers.length) {
+    Object.values(ids).forEach(el => el.textContent = "—");
+    return;
+  }
+
+  const histories = {};
+  await Promise.all(tickers.map(async ticker => {
+    try {
+      histories[ticker] = await fetchHistory(ticker, "max");
+    } catch (e) {
+      console.warn(`History fetch failed: ${ticker}`, e);
+    }
+  }));
+
+  const now = new Date();
+  const targets = {
+    "1d": new Date(now.getTime() - 86400000),
+    "1w": new Date(now.getTime() - 7 * 86400000),
+    "1m": new Date(now),
+    "1y": new Date(now)
+  };
+  targets["1m"].setMonth(targets["1m"].getMonth() - 1);
+  targets["1y"].setFullYear(targets["1y"].getFullYear() - 1);
+
+  const result = {};
+
+  for (const period of ["1d", "1w", "1m", "1y", "all"]) {
+    let currentTotal = 0;
+    let baseTotal = 0;
+
+    for (const ticker of tickers) {
+      const grp = groups[ticker];
+      const buyQty = grp.filter(x => x.action === "buy").reduce((s,x) => s + x.qty, 0);
+      const sellQty = grp.filter(x => x.action === "sell").reduce((s,x) => s + x.qty, 0);
+      const heldQty = buyQty - sellQty;
+
+      const current = prices[ticker]?.price;
+      const rows = histories[ticker]?.rows;
+
+      if (heldQty <= 0 || current == null || !rows?.length) continue;
+
+      const base = period === "all"
+        ? rows[0]?.close
+        : historicalCloseBefore(rows, targets[period]);
+
+      if (base == null || base <= 0) continue;
+
+      const currentThb = toThb(heldQty * current, ticker);
+      const baseThb = toThb(heldQty * base, ticker);
+
+      if (currentThb == null || baseThb == null) continue;
+
+      currentTotal += currentThb;
+      baseTotal += baseThb;
+    }
+
+    result[period] = baseTotal > 0
+      ? ((currentTotal / baseTotal) - 1) * 100
+      : null;
+  }
+
+  for (const period of Object.keys(ids)) {
+    const el = ids[period];
+    const value = result[period];
+
+    if (value == null) {
+      el.textContent = "N/A";
+      el.className = "summary-pl flat";
+    } else {
+      el.textContent = `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
+      el.className = "summary-pl " + (value > 0 ? "pos" : value < 0 ? "neg" : "flat");
+    }
+  }
+}
+
 function renderSummary() {
   const sumEl = document.getElementById("summary");
   if (!entries.length) { sumEl.style.display = "none"; return; }
@@ -440,7 +551,6 @@ function renderSummary() {
     const heldQty  = buyQty - sellQty;
     const avgCost  = buyQty > 0 ? buyValue / buyQty : 0;
     const cur = prices[ticker]?.price;
-    const prevClose = prices[ticker]?.previousClose ?? null;
 
     if (!cur || heldQty <= 0) { if (heldQty > 0) incomplete = true; continue; }
 
@@ -450,10 +560,11 @@ function renderSummary() {
     totalValue += val;
     totalCost  += cost;
 
-    // Whole-portfolio 1D change.
+    // Whole-portfolio 1-day change based on each stock's previous close.
+    // Foreign stocks are converted to THB using the current USD/THB rate.
     if (prevClose !== null && prevClose > 0) {
       const prevVal = toThb(heldQty * prevClose, ticker);
-      const dayChg = toThb(heldQty * (cur - prevClose), ticker);
+      const dayChg  = toThb(heldQty * (cur - prevClose), ticker);
 
       if (prevVal !== null && dayChg !== null) {
         totalPrevValue += prevVal;
@@ -468,7 +579,11 @@ function renderSummary() {
   const dayPct = totalPrevValue > 0
     ? (totalDayChange / totalPrevValue) * 100
     : null;
-  const dayCls = totalDayChange > 0 ? "pos" : totalDayChange < 0 ? "neg" : "flat";
+  const dayCls = totalDayChange > 0
+    ? "pos"
+    : totalDayChange < 0
+      ? "neg"
+      : "flat";
   const daySign = totalDayChange > 0 ? "+" : "";
 
   const fmt   = (n) => "฿" + Math.round(n).toLocaleString();
@@ -523,13 +638,12 @@ function renderSummary() {
   if (totalPrevValue > 0) {
     dayEl.textContent = daySign + fmt(totalDayChange);
     dayEl.className = "summary-pl " + dayCls;
-    dayPctEl.textContent = (dayPct >= 0 ? "+" : "") + dayPct.toFixed(2) + "%";
-    dayPctEl.className = "summary-sub " + dayCls;
+    dayPctEl.textContent =
+      (dayPct >= 0 ? "+" : "") + dayPct.toFixed(2) + "%";
   } else {
     dayEl.textContent = "—";
     dayEl.className = "summary-pl flat";
     dayPctEl.textContent = "Previous close unavailable";
-    dayPctEl.className = "summary-sub";
   }
 }
 
@@ -541,6 +655,7 @@ function render() {
   const list = document.getElementById("list");
   if (tickers.length === 0) { list.innerHTML = '<p class="empty">No entries yet.</p>'; renderSummary(); return; }
   renderSummary();
+  renderPerformance();
 
   // คำนวณ total portfolio value สำหรับ % สัดส่วน
   const totalPortValue = tickers.reduce((sum, t) => {
