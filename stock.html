@@ -21,10 +21,10 @@
   .summary-sub { font-size:12px; color:#8b8b98; margin-top:1px; font-variant-numeric:tabular-nums; }
   .summary-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
   .summary-cell { background:#13131a; border-radius:8px; padding:10px 12px; }
-  .summary-pl.pos { color:#34d399; } .summary-pl.neg { color:#f87171; } .summary-pl.flat { color:#8b8b98; }
+  .summary-pl.pos { color:#22c55e; } .summary-pl.neg { color:#ef4444; } .summary-pl.flat { color:#8b8b98; }
   .fx-bar { display:flex; align-items:center; gap:6px; margin-top:12px; padding-top:12px; border-top:1px solid #26262d; font-size:12px; color:#8b8b98; }
   .fx-badge { background:#22222a; border:1px solid #38383f; border-radius:6px; padding:2px 8px; font-size:12px; color:#ededf0; font-variant-numeric:tabular-nums; }
-  .fx-err { font-size:12px; color:#f87171; }
+  .fx-err { font-size:12px; color:#ef4444; }
 
   /* Performance tab */
   .perf-section { margin-top:12px; padding-top:12px; border-top:1px solid #26262d; }
@@ -52,7 +52,7 @@
   #loginScreen h1 { margin-bottom:6px; }
   #loginScreen .sub { margin-bottom:28px; }
   #loginScreen input { margin:0 0 12px; text-align:center; letter-spacing:6px; font-size:18px; padding:10px; }
-  #loginScreen p.err { color:#f87171; font-size:13px; min-height:20px; margin-top:8px; }
+  #loginScreen p.err { color:#ef4444; font-size:13px; min-height:20px; margin-top:8px; }
   #app { display:none; }
   #topbar { display:flex; justify-content:flex-end; margin-bottom:2px; }
   #logoutBtn { background:none; border:none; color:#6b6b78; font-size:13px; font-family:'Inter',sans-serif; cursor:pointer; padding:4px 0; }
@@ -66,18 +66,18 @@
   .name { flex:1; min-width:0; }
   .name .t { font-weight:700; font-size:13px; letter-spacing:-0.2px; }
   .name .qty { color:#8b8b98; font-size:11px; margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .day-change.pos { color:#34d399; } .day-change.neg { color:#f87171; } .day-change.flat { color:#6b6b78; }
+  .day-change.pos { color:#22c55e; } .day-change.neg { color:#ef4444; } .day-change.flat { color:#6b6b78; }
   .port-bar-wrap { height:3px; background:#26262d; border-radius:2px; margin-top:5px; width:100%; }
   .port-bar { height:3px; border-radius:2px; background:#6366f1; transition:width .3s; }
   .port-pct { font-size:10px; color:#6366f1; font-weight:600; margin-top:1px; }
   .price-col { display:flex; flex-direction:column; align-items:flex-end; flex-shrink:0; }
   .price { text-align:right; font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
   .pl-sub { font-size:11px; font-weight:600; font-variant-numeric:tabular-nums; margin-top:1px; }
-  .pl-sub.pos { color:#34d399; } .pl-sub.neg { color:#f87171; } .pl-sub.flat { color:#8b8b98; }
+  .pl-sub.pos { color:#22c55e; } .pl-sub.neg { color:#ef4444; } .pl-sub.flat { color:#8b8b98; }
   .pct { text-align:right; flex-shrink:0; }
   .pct span { display:inline-block; font-size:11px; font-weight:700; padding:2px 5px; border-radius:6px; font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1.4; }
-  .pct.pos span { background:rgba(52,211,153,.15); color:#34d399; }
-  .pct.neg span { background:rgba(248,113,113,.15); color:#f87171; }
+  .pct.pos span { background:rgba(34,197,94,.15); color:#22c55e; }
+  .pct.neg span { background:rgba(239,68,68,.15); color:#ef4444; }
   .pct.flat span { background:#26262d; color:#8b8b98; }
   .chev { width:16px; color:#52525b; font-size:11px; transition:transform .2s; flex-shrink:0; }
   .chev.open { transform:rotate(90deg); }
@@ -91,10 +91,10 @@
   .txn:first-of-type { border-top:none; }
   .txn-left { font-size:12.5px; flex:1; line-height:1.6; }
   .txn-profit { font-size:12px; font-weight:600; margin-left:6px; }
-  .txn-profit.pos { color:#34d399; } .txn-profit.neg { color:#f87171; }
+  .txn-profit.pos { color:#22c55e; } .txn-profit.neg { color:#ef4444; }
   .txn-actions { display:flex; gap:0; flex-shrink:0; margin-top:1px; }
   .txn-edit, .del { background:none; border:none; color:#52525b; cursor:pointer; font-size:13px; padding:2px 6px; transition:color .12s; }
-  .txn-edit:hover { color:#c4c4cc; } .del:hover { color:#f87171; }
+  .txn-edit:hover { color:#c4c4cc; } .del:hover { color:#ef4444; }
   .txn-form { margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .txn-form input, .txn-form select { font-size:13px; padding:7px 10px; }
   .txn-form-btns { grid-column:span 2; display:flex; gap:8px; }
@@ -102,8 +102,8 @@
   .btn-save { background:#6366f1; color:#fff; } .btn-save:hover { background:#818cf8; }
   .btn-cancel { background:#22222a; color:#b4b4c0; border:1px solid #38383f !important; } .btn-cancel:hover { background:#2a2a32; }
   .tag { font-size:11px; font-weight:700; padding:2px 7px; border-radius:5px; margin-right:7px; letter-spacing:.3px; text-transform:uppercase; }
-  .tag.buy { background:rgba(52,211,153,.15); color:#34d399; }
-  .tag.sell { background:rgba(248,113,113,.15); color:#f87171; }
+  .tag.buy { background:rgba(34,197,94,.15); color:#22c55e; }
+  .tag.sell { background:rgba(239,68,68,.15); color:#ef4444; }
   .tag.watch { background:rgba(251,191,36,.1); color:#fbbf24; }
   .txn-meta { color:#8b8b98; }
 
@@ -157,6 +157,7 @@
       <div class="summary-cell">
         <div class="summary-label">Unrealized P/L</div>
         <div id="sum-pl" class="summary-pl" style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;">—</div>
+        <div id="sum-day" class="summary-sub summary-pl" style="font-size:12px;">—</div>
       </div>
       <div class="summary-cell">
         <div class="summary-label">Return / XIRR</div>
@@ -223,6 +224,7 @@ const firebaseConfig = {
   messagingSenderId: "495239740483",
   appId: "1:495239740483:web:ab9546d55c937dc6ece8f6"
 };
+
 const OWNER_EMAIL = "araikordai@mail.com";
 
 const app = initializeApp(firebaseConfig);
@@ -499,7 +501,7 @@ function renderSummary() {
   if (!entries.length) { sumEl.style.display = "none"; return; }
   sumEl.style.display = "block";
 
-  let totalValue = 0, totalCost = 0, incomplete = false;
+  let totalValue = 0, totalCost = 0, totalPrevValue = 0, totalDayChange = 0, incomplete = false;
   const groups = groupByTicker(entries);
 
   for (const [ticker, txns] of Object.entries(groups)) {
@@ -509,12 +511,21 @@ function renderSummary() {
     const heldQty  = buyQty - sellQty;
     const avgCost  = buyQty > 0 ? buyValue / buyQty : 0;
     const cur = prices[ticker]?.price;
+    const prevClose = prices[ticker]?.previousClose ?? null;
     if (!cur || heldQty <= 0) { if (heldQty > 0) incomplete = true; continue; }
     const val  = toThb(heldQty * cur, ticker);
     const cost = toThb(heldQty * avgCost, ticker);
     if (val === null || cost === null) { incomplete = true; continue; }
     totalValue += val;
     totalCost  += cost;
+    if (prevClose && prevClose > 0) {
+      const prevVal = toThb(heldQty * prevClose, ticker);
+      const dayChg  = toThb(heldQty * (cur - prevClose), ticker);
+      if (prevVal !== null && dayChg !== null) {
+        totalPrevValue += prevVal;
+        totalDayChange += dayChg;
+      }
+    }
   }
 
   const pl = totalValue - totalCost;
@@ -528,6 +539,18 @@ function renderSummary() {
   document.getElementById("sum-cost").textContent = fmt(totalCost);
   document.getElementById("sum-pl").textContent = plSign + fmt(pl);
   document.getElementById("sum-pl").className = "summary-pl " + plCls;
+
+  const dayEl = document.getElementById("sum-day");
+  if (totalPrevValue > 0) {
+    const dayPct = (totalDayChange / totalPrevValue) * 100;
+    const dayCls = totalDayChange > 0 ? "pos" : totalDayChange < 0 ? "neg" : "flat";
+    const daySign = totalDayChange >= 0 ? "+" : "";
+    dayEl.textContent = `1D: ${daySign}${fmt(totalDayChange)} (${daySign}${dayPct.toFixed(2)}%)`;
+    dayEl.className = "summary-sub summary-pl " + dayCls;
+  } else {
+    dayEl.textContent = "1D: —";
+    dayEl.className = "summary-sub summary-pl flat";
+  }
   document.getElementById("sum-pct").textContent = plSign + plPct.toFixed(2) + "%";
   document.getElementById("sum-pct").className = "summary-pl " + plCls;
 
