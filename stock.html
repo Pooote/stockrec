@@ -16,16 +16,26 @@
   h1 { font-size:20px; font-weight:700; letter-spacing:-0.5px; margin:0 0 2px; }
   .sub { color:#8b8b98; font-size:13px; margin:0 0 16px; }
   .summary { background:#18181c; border:1px solid #2e2e35; border-radius:12px; padding:12px; margin-bottom:14px; }
-  .summary-top { display:flex; align-items:baseline; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:6px; }
   .summary-label { font-size:12.5px; color:#8b8b98; margin-bottom:2px; }
   .summary-value { font-size:20px; font-weight:700; letter-spacing:-0.5px; font-variant-numeric:tabular-nums; }
   .summary-sub { font-size:12px; color:#8b8b98; margin-top:1px; font-variant-numeric:tabular-nums; }
   .summary-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
   .summary-cell { background:#13131a; border-radius:8px; padding:10px 12px; }
-  .summary-pl.pos { color:#34d399; } .summary-pl.neg { color:#f87171; }
-  .fx-bar { display:flex; align-items:center; gap:6px; margin-top:14px; padding-top:14px; border-top:1px solid #26262d; font-size:12px; color:#8b8b98; }
+  .summary-pl.pos { color:#34d399; } .summary-pl.neg { color:#f87171; } .summary-pl.flat { color:#8b8b98; }
+  .fx-bar { display:flex; align-items:center; gap:6px; margin-top:12px; padding-top:12px; border-top:1px solid #26262d; font-size:12px; color:#8b8b98; }
   .fx-badge { background:#22222a; border:1px solid #38383f; border-radius:6px; padding:2px 8px; font-size:12px; color:#ededf0; font-variant-numeric:tabular-nums; }
   .fx-err { font-size:12px; color:#f87171; }
+
+  /* Performance tab */
+  .perf-section { margin-top:12px; padding-top:12px; border-top:1px solid #26262d; }
+  .perf-tabs { display:flex; gap:4px; margin-bottom:10px; }
+  .perf-tab { background:#13131a; border:1px solid #2e2e35; color:#8b8b98; border-radius:6px; padding:4px 12px; font-size:12px; font-family:'Inter',sans-serif; font-weight:600; cursor:pointer; transition:all .15s; }
+  .perf-tab:hover { background:#1f1f28; color:#ededf0; }
+  .perf-tab.active { background:#6366f1; border-color:#6366f1; color:#fff; }
+  .perf-result { display:flex; align-items:baseline; gap:10px; min-height:36px; }
+  .perf-value { font-size:22px; font-weight:700; font-variant-numeric:tabular-nums; }
+  .perf-loading { color:#8b8b98; font-size:13px; }
+
   .card { background:#18181c; border:1px solid #2e2e35; border-radius:12px; padding:12px; margin-bottom:14px; }
   .grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:10px; }
   input, select { background:#09090b; border:1px solid #27272a; border-radius:8px; padding:8px 10px; font-size:14px; font-family:'Inter',sans-serif; color:#ededf0; width:100%; transition:border-color .15s; }
@@ -64,8 +74,6 @@
   .price { text-align:right; font-size:13px; font-weight:600; font-variant-numeric:tabular-nums; }
   .pl-sub { font-size:11px; font-weight:600; font-variant-numeric:tabular-nums; margin-top:1px; }
   .pl-sub.pos { color:#34d399; } .pl-sub.neg { color:#f87171; } .pl-sub.flat { color:#8b8b98; }
-  .change { width:68px; text-align:right; font-size:11.5px; font-variant-numeric:tabular-nums; }
-  .change.pos { color:#34d399; } .change.neg { color:#f87171; } .change.flat { color:#6b6b78; }
   .pct { text-align:right; flex-shrink:0; }
   .pct span { display:inline-block; font-size:11px; font-weight:700; padding:2px 5px; border-radius:6px; font-variant-numeric:tabular-nums; white-space:nowrap; line-height:1.4; }
   .pct.pos span { background:rgba(52,211,153,.15); color:#34d399; }
@@ -74,7 +82,7 @@
   .chev { width:16px; color:#52525b; font-size:11px; transition:transform .2s; flex-shrink:0; }
   .chev.open { transform:rotate(90deg); }
 
-  .details { padding:2px 4px 16px 62px; }
+  .details { padding:2px 4px 16px 46px; }
   .btn-refresh-all { display:inline-flex; align-items:center; gap:6px; background:#1f1f28; border:1px solid #3f3f52; color:#818cf8; border-radius:8px; padding:7px 14px; font-size:13px; font-family:'Inter',sans-serif; font-weight:600; cursor:pointer; transition:background .15s; }
   .btn-refresh-all:hover { background:#2a2a38; }
   .btn-refresh-all:disabled { opacity:.45; cursor:not-allowed; }
@@ -86,16 +94,13 @@
   .txn-profit.pos { color:#34d399; } .txn-profit.neg { color:#f87171; }
   .txn-actions { display:flex; gap:0; flex-shrink:0; margin-top:1px; }
   .txn-edit, .del { background:none; border:none; color:#52525b; cursor:pointer; font-size:13px; padding:2px 6px; transition:color .12s; }
-  .txn-edit:hover { color:#c4c4cc; }
-  .del:hover { color:#f87171; }
+  .txn-edit:hover { color:#c4c4cc; } .del:hover { color:#f87171; }
   .txn-form { margin-top:8px; display:grid; grid-template-columns:1fr 1fr; gap:8px; }
   .txn-form input, .txn-form select { font-size:13px; padding:7px 10px; }
   .txn-form-btns { grid-column:span 2; display:flex; gap:8px; }
   .txn-form-btns button { font-size:13px; font-family:'Inter',sans-serif; font-weight:600; padding:7px 14px; border-radius:8px; border:none; cursor:pointer; transition:background .12s; }
-  .btn-save { background:#6366f1; color:#fff; }
-  .btn-save:hover { background:#818cf8; }
-  .btn-cancel { background:#22222a; color:#b4b4c0; border:1px solid #38383f !important; }
-  .btn-cancel:hover { background:#2a2a32; }
+  .btn-save { background:#6366f1; color:#fff; } .btn-save:hover { background:#818cf8; }
+  .btn-cancel { background:#22222a; color:#b4b4c0; border:1px solid #38383f !important; } .btn-cancel:hover { background:#2a2a32; }
   .tag { font-size:11px; font-weight:700; padding:2px 7px; border-radius:5px; margin-right:7px; letter-spacing:.3px; text-transform:uppercase; }
   .tag.buy { background:rgba(52,211,153,.15); color:#34d399; }
   .tag.sell { background:rgba(248,113,113,.15); color:#f87171; }
@@ -103,21 +108,21 @@
   .txn-meta { color:#8b8b98; }
 
   @media (max-width: 480px) {
-    .grow { flex-wrap: wrap; gap: 2px 6px; padding: 10px 4px; align-items: center; }
-    .badge { order: 1; width: 34px; height: 26px; font-size: 9px; flex-shrink:0; }
-    .name { order: 2; flex: 1; min-width: 0; }
-    .name .t { font-size: 13px; }
-    .name .qty { font-size: 10.5px; white-space: normal; }
-    .price-col { order: 3; align-items: flex-end; }
-    .price { font-size: 13px; }
-    .pl-sub { font-size: 10px; }
-    .pct { order: 4; }
-    .chev { order: 5; }
-    .summary-grid { grid-template-columns: 1fr 1fr; }
-    .summary-grid .summary-cell:last-child { grid-column: span 2; }
-    h1 { font-size: 18px; }
-    .summary-value { font-size: 20px !important; }
-    .details { padding: 4px 4px 12px 40px; }
+    .grow { flex-wrap:wrap; gap:2px 6px; padding:10px 4px; align-items:center; }
+    .badge { order:1; width:34px; height:26px; font-size:9px; flex-shrink:0; }
+    .name { order:2; flex:1; min-width:0; }
+    .name .qty { font-size:10.5px; white-space:normal; }
+    .price-col { order:3; align-items:flex-end; }
+    .price { font-size:13px; }
+    .pl-sub { font-size:10px; }
+    .pct { order:4; }
+    .chev { order:5; }
+    .summary-grid { grid-template-columns:1fr 1fr; }
+    .summary-grid .summary-cell:last-child { grid-column:span 2; }
+    h1 { font-size:18px; }
+    .summary-value { font-size:20px !important; }
+    .details { padding:4px 4px 12px 40px; }
+    .perf-tabs { flex-wrap:wrap; }
   }
 </style>
 </head>
@@ -138,47 +143,41 @@
 
   <div id="errorBanner" class="error" style="display:none;">Save failed. Check your internet connection.</div>
 
-  <!-- Summary -->
   <div class="summary" id="summary" style="display:none">
-    <div class="summary-top">
-      <div>
-        <div class="summary-label">Total Portfolio Value</div>
-        <div class="summary-value" id="sum-value">—</div>
-        <div class="summary-sub" id="sum-value-sub"></div>
-      </div>
+    <div style="margin-bottom:12px;">
+      <div class="summary-label">Total Portfolio Value</div>
+      <div class="summary-value" id="sum-value">—</div>
+      <div class="summary-sub" id="sum-value-sub"></div>
     </div>
-    <div class="summary-grid" style="grid-template-columns:1fr 1fr 1fr 1fr;">
+    <div class="summary-grid">
       <div class="summary-cell">
         <div class="summary-label">Total Cost</div>
-        <div id="sum-cost" style="font-size:16px;font-weight:600;font-variant-numeric:tabular-nums;">—</div>
+        <div id="sum-cost" style="font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;">—</div>
       </div>
       <div class="summary-cell">
         <div class="summary-label">Unrealized P/L</div>
-        <div id="sum-pl" class="summary-pl" style="font-size:16px;font-weight:700;font-variant-numeric:tabular-nums;">—</div>
+        <div id="sum-pl" class="summary-pl" style="font-size:15px;font-weight:700;font-variant-numeric:tabular-nums;">—</div>
       </div>
       <div class="summary-cell">
-        <div class="summary-label">Return</div>
-        <div id="sum-pct" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
-      </div>
-      <div class="summary-cell">
-        <div class="summary-label">1D Change</div>
-        <div id="sum-day-change" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
-        <div id="sum-day-pct" class="summary-sub"></div>
-      </div>
-      <div class="summary-cell" style="grid-column:1 / -1">
-        <div class="summary-label">XIRR (annualized return on actual cash flows)</div>
-        <div id="sum-xirr" class="summary-pl" style="font-size:16px;font-weight:700;">—</div>
+        <div class="summary-label">Return / XIRR</div>
+        <div id="sum-pct" class="summary-pl" style="font-size:15px;font-weight:700;">—</div>
+        <div id="sum-xirr" class="summary-sub summary-pl" style="font-size:12px;">—</div>
       </div>
     </div>
 
-    <div style="margin-top:12px;padding-top:12px;border-top:1px solid #26262d;">
-      <div class="summary-label">Performance</div>
-      <div id="performance-grid" style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:6px;">
-        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">1D</div><div id="perf-1d" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
-        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">1W</div><div id="perf-1w" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
-        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">1M</div><div id="perf-1m" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
-        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">1Y</div><div id="perf-1y" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
-        <div class="summary-cell" style="padding:8px 10px;"><div class="summary-label">ALL</div><div id="perf-all" class="summary-pl flat" style="font-size:15px;font-weight:700;">—</div></div>
+    <!-- Performance tab selector -->
+    <div class="perf-section">
+      <div class="summary-label" style="margin-bottom:8px;">Performance</div>
+      <div class="perf-tabs">
+        <button class="perf-tab active" onclick="selectPeriod('1d')">1D</button>
+        <button class="perf-tab" onclick="selectPeriod('1w')">1W</button>
+        <button class="perf-tab" onclick="selectPeriod('1m')">1M</button>
+        <button class="perf-tab" onclick="selectPeriod('1y')">1Y</button>
+        <button class="perf-tab" onclick="selectPeriod('all')">ALL</button>
+      </div>
+      <div class="perf-result">
+        <div id="perf-value" class="perf-value flat">—</div>
+        <div id="perf-loading" class="perf-loading" style="display:none;">Loading…</div>
       </div>
     </div>
 
@@ -213,15 +212,9 @@
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getFirestore, collection, doc, addDoc, deleteDoc, setDoc, updateDoc,
-  onSnapshot, query
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, addDoc, deleteDoc, setDoc, updateDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// === Replace with your values from Firebase Console > Project settings > Your apps ===
 const firebaseConfig = {
   apiKey: "AIzaSyAi3cy0ueunppSDCDGSyKj7X72kO3NtRTE",
   authDomain: "stock-record-6925a.firebaseapp.com",
@@ -230,21 +223,18 @@ const firebaseConfig = {
   messagingSenderId: "495239740483",
   appId: "1:495239740483:web:ab9546d55c937dc6ece8f6"
 };
-// Fixed email for the single account in Firebase Console > Authentication > Users
-// The UI only shows a PIN field — the email is never shown to the user
 const OWNER_EMAIL = "araikordai@mail.com";
-// ==================================================================================
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 const LABELS = { buy: "Buy", sell: "Sell", watch: "Watch" };
-const PALETTE = ["#18181b","#991b1b","#1d4ed8","#0f766e","#7c3aed","#a16207","#374151","#be185d","#065f46"];
-
 let entries = [], prices = {}, expanded = new Set(), editingId = null;
 let unsubEntries = null, unsubPrices = null;
-let fxRate = null; // USD → THB
+let fxRate = null;
+let selectedPeriod = "1d";
+let perfCache = {}; // { period: value% | null | "loading" }
 
 document.getElementById("f-date").value = new Date().toISOString().slice(0,10);
 
@@ -264,7 +254,6 @@ onAuthStateChanged(auth, (user) => {
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("app").style.display = "block";
     subscribe();
-    // auto-fetch ราคาหลัง entries โหลดครั้งแรก (รอ 1.5s ให้ Firestore listener ยิงก่อน)
     setTimeout(() => refreshAll(), 1500);
   } else {
     document.getElementById("loginScreen").style.display = "block";
@@ -277,8 +266,7 @@ onAuthStateChanged(auth, (user) => {
 function subscribe() {
   unsubEntries = onSnapshot(query(collection(db, "entries")), (snap) => {
     entries = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-    setError(false);
-    render();
+    setError(false); render();
   }, () => setError(true));
   unsubPrices = onSnapshot(query(collection(db, "prices")), (snap) => {
     prices = {};
@@ -290,7 +278,6 @@ function subscribe() {
 window.refreshAll = async function () {
   const btn = document.getElementById("btnRefreshAll");
   if (btn) { btn.disabled = true; btn.textContent = "Fetching…"; }
-  // หา unique tickers ที่ถือ (heldQty > 0)
   const groups = {};
   for (const e of entries) { if (!groups[e.ticker]) groups[e.ticker] = []; groups[e.ticker].push(e); }
   const tickers = Object.keys(groups).filter(t => {
@@ -298,10 +285,8 @@ window.refreshAll = async function () {
     const sQty = groups[t].filter(x=>x.action==="sell").reduce((s,x)=>s+x.qty,0);
     return bQty - sQty > 0;
   });
-  await Promise.all([
-    fetchFxRate(),
-    ...tickers.map(t => fetchTickerPrice(t))
-  ]);
+  perfCache = {};
+  await Promise.all([fetchFxRate(), ...tickers.map(t => fetchTickerPrice(t))]);
   if (btn) { btn.disabled = false; btn.textContent = "↻ Refresh All"; }
 };
 
@@ -342,37 +327,6 @@ async function persistPrice(ticker, val, previousClose) {
   } catch { setError(true); }
 }
 
-window.toggle = function (ticker) {
-  if (expanded.has(ticker)) expanded.delete(ticker); else expanded.add(ticker);
-  render();
-};
-
-function colorFor(ticker) {
-  let h = 0;
-  for (let i = 0; i < ticker.length; i++) h = (h * 31 + ticker.charCodeAt(i)) >>> 0;
-  return ["#18181b","#991b1b","#1d4ed8","#0f766e","#7c3aed","#a16207","#374151","#be185d","#065f46"][h % 9];
-}
-
-function groupByTicker(list) {
-  const map = {};
-  for (const e of list) { if (!map[e.ticker]) map[e.ticker] = []; map[e.ticker].push(e); }
-  return map;
-}
-
-window.editEntry = function (id) { editingId = id; render(); };
-window.cancelEdit = function () { editingId = null; render(); };
-window.saveEdit = async function (id) {
-  const action = document.getElementById(`e-action-${id}`).value;
-  const price = parseFloat(document.getElementById(`e-price-${id}`).value);
-  const qty = parseFloat(document.getElementById(`e-qty-${id}`).value);
-  const date = document.getElementById(`e-date-${id}`).value;
-  const note = document.getElementById(`e-note-${id}`).value.trim();
-  if (isNaN(price) || isNaN(qty)) return;
-  try { await updateDoc(doc(db, "entries", id), { action, price, qty, date, note }); setError(false); }
-  catch { setError(true); }
-  editingId = null; render();
-};
-
 window.fetchFxRate = async function () {
   document.getElementById("fx-err").textContent = "";
   try {
@@ -382,24 +336,16 @@ window.fetchFxRate = async function () {
     fxRate = data.price;
     document.getElementById("fx-rate").textContent = fxRate.toFixed(2);
     renderSummary();
-  } catch (e) {
-    document.getElementById("fx-err").textContent = "fetch failed";
-  }
+  } catch { document.getElementById("fx-err").textContent = "fetch failed"; }
 };
 
-function isThaiStock(ticker) {
-  return ticker.endsWith(".BK");
-}
-
+function isThaiStock(ticker) { return ticker.endsWith(".BK"); }
 function toThb(value, ticker) {
   if (isThaiStock(ticker)) return value;
   return fxRate ? value * fxRate : null;
 }
 
 function xirr(cashflows) {
-  // cashflows = [{amount, date}] โดย amount ติดลบ=จ่ายออก, บวก=รับเข้า
-  // ใช้ Newton-Raphson
-  const today = new Date();
   const days = cashflows.map(cf => (new Date(cf.date) - new Date(cashflows[0].date)) / 86400000);
   let r = 0.1;
   for (let i = 0; i < 100; i++) {
@@ -416,213 +362,166 @@ function xirr(cashflows) {
   return r;
 }
 
-async function fetchHistory(ticker, range = "max") {
-  const res = await fetch(`/api/history?ticker=${encodeURIComponent(ticker)}&range=${range}`);
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || `History fetch failed: ${ticker}`);
-  return data;
-}
-
-function historicalCloseBefore(rows, targetDate) {
-  if (!rows?.length) return null;
-  const target = targetDate.getTime();
-  let best = null;
-
-  for (const row of rows) {
-    const ts = new Date(row.date).getTime();
-    if (ts <= target && row.close != null) best = row.close;
-  }
-  return best;
-}
-
-async function renderPerformance() {
-  const ids = {
-    "1d": document.getElementById("perf-1d"),
-    "1w": document.getElementById("perf-1w"),
-    "1m": document.getElementById("perf-1m"),
-    "1y": document.getElementById("perf-1y"),
-    "all": document.getElementById("perf-all")
-  };
-
-  if (!Object.values(ids).every(Boolean)) return;
-
-  const groups = groupByTicker(entries);
-  const tickers = Object.keys(groups).filter(t => {
-    const buyQty = groups[t].filter(x => x.action === "buy").reduce((s,x) => s + x.qty, 0);
-    const sellQty = groups[t].filter(x => x.action === "sell").reduce((s,x) => s + x.qty, 0);
-    return buyQty - sellQty > 0;
+// Performance tab
+window.selectPeriod = async function (period) {
+  selectedPeriod = period;
+  document.querySelectorAll(".perf-tab").forEach(b => {
+    b.classList.toggle("active", b.textContent.toLowerCase() === period);
   });
+  await loadPerformance(period);
+};
 
-  if (!tickers.length) {
-    Object.values(ids).forEach(el => el.textContent = "—");
+async function loadPerformance(period) {
+  const valEl = document.getElementById("perf-value");
+  const loadEl = document.getElementById("perf-loading");
+
+  if (perfCache[period] !== undefined) {
+    renderPerfValue(perfCache[period]);
     return;
   }
 
+  valEl.textContent = "—";
+  loadEl.style.display = "block";
+
+  const groups = groupByTicker(entries);
+  const heldTickers = Object.keys(groups).filter(t => {
+    const bQty = groups[t].filter(x=>x.action==="buy").reduce((s,x)=>s+x.qty,0);
+    const sQty = groups[t].filter(x=>x.action==="sell").reduce((s,x)=>s+x.qty,0);
+    return bQty - sQty > 0;
+  });
+
+  if (!heldTickers.length || !fxRate) {
+    loadEl.style.display = "none";
+    perfCache[period] = null;
+    renderPerfValue(null);
+    return;
+  }
+
+  // fetch history ทุก ticker พร้อมกัน
   const histories = {};
-  await Promise.all(tickers.map(async ticker => {
+  await Promise.all(heldTickers.map(async t => {
     try {
-      histories[ticker] = await fetchHistory(ticker, "max");
-    } catch (e) {
-      console.warn(`History fetch failed: ${ticker}`, e);
-    }
+      const res = await fetch(`/api/history?ticker=${encodeURIComponent(t)}&range=max`);
+      const data = await res.json();
+      if (res.ok) histories[t] = data.rows;
+    } catch {}
   }));
 
   const now = new Date();
   const targets = {
     "1d": new Date(now.getTime() - 86400000),
     "1w": new Date(now.getTime() - 7 * 86400000),
-    "1m": new Date(now),
-    "1y": new Date(now)
+    "1m": new Date(now.getFullYear(), now.getMonth() - 1, now.getDate()),
+    "1y": new Date(now.getFullYear() - 1, now.getMonth(), now.getDate()),
+    "all": null,
   };
-  targets["1m"].setMonth(targets["1m"].getMonth() - 1);
-  targets["1y"].setFullYear(targets["1y"].getFullYear() - 1);
 
-  const result = {};
+  let currentTotal = 0, baseTotal = 0;
+  for (const ticker of heldTickers) {
+    const grp = groups[ticker];
+    const bQty = grp.filter(x=>x.action==="buy").reduce((s,x)=>s+x.qty,0);
+    const sQty = grp.filter(x=>x.action==="sell").reduce((s,x)=>s+x.qty,0);
+    const heldQty = bQty - sQty;
+    const cur = prices[ticker]?.price;
+    const rows = histories[ticker];
+    if (!cur || heldQty <= 0 || !rows?.length) continue;
 
-  for (const period of ["1d", "1w", "1m", "1y", "all"]) {
-    let currentTotal = 0;
-    let baseTotal = 0;
-
-    for (const ticker of tickers) {
-      const grp = groups[ticker];
-      const buyQty = grp.filter(x => x.action === "buy").reduce((s,x) => s + x.qty, 0);
-      const sellQty = grp.filter(x => x.action === "sell").reduce((s,x) => s + x.qty, 0);
-      const heldQty = buyQty - sellQty;
-
-      const current = prices[ticker]?.price;
-      const rows = histories[ticker]?.rows;
-
-      if (heldQty <= 0 || current == null || !rows?.length) continue;
-
-      const base = period === "all"
-        ? rows[0]?.close
-        : historicalCloseBefore(rows, targets[period]);
-
-      if (base == null || base <= 0) continue;
-
-      const currentThb = toThb(heldQty * current, ticker);
-      const baseThb = toThb(heldQty * base, ticker);
-
-      if (currentThb == null || baseThb == null) continue;
-
-      currentTotal += currentThb;
-      baseTotal += baseThb;
+    const targetDate = targets[period];
+    let base;
+    if (period === "all") {
+      base = rows[0]?.close;
+    } else {
+      const targetTs = targetDate.getTime();
+      base = null;
+      for (const row of rows) {
+        if (new Date(row.date).getTime() <= targetTs && row.close != null) base = row.close;
+      }
     }
+    if (!base || base <= 0) continue;
 
-    result[period] = baseTotal > 0
-      ? ((currentTotal / baseTotal) - 1) * 100
-      : null;
+    const curThb = toThb(heldQty * cur, ticker);
+    const baseThb = toThb(heldQty * base, ticker);
+    if (curThb == null || baseThb == null) continue;
+    currentTotal += curThb;
+    baseTotal += baseThb;
   }
 
-  for (const period of Object.keys(ids)) {
-    const el = ids[period];
-    const value = result[period];
+  loadEl.style.display = "none";
+  const pct = baseTotal > 0 ? ((currentTotal / baseTotal) - 1) * 100 : null;
+  perfCache[period] = pct;
+  renderPerfValue(pct);
+}
 
-    if (value == null) {
-      el.textContent = "N/A";
-      el.className = "summary-pl flat";
-    } else {
-      el.textContent = `${value >= 0 ? "+" : ""}${value.toFixed(2)}%`;
-      el.className = "summary-pl " + (value > 0 ? "pos" : value < 0 ? "neg" : "flat");
-    }
+function renderPerfValue(pct) {
+  const el = document.getElementById("perf-value");
+  if (pct == null) {
+    el.textContent = "N/A";
+    el.className = "perf-value flat";
+  } else {
+    el.textContent = (pct >= 0 ? "+" : "") + pct.toFixed(2) + "%";
+    el.className = "perf-value " + (pct > 0 ? "pos" : pct < 0 ? "neg" : "flat");
   }
 }
+
+function groupByTicker(list) {
+  const map = {};
+  for (const e of list) { if (!map[e.ticker]) map[e.ticker] = []; map[e.ticker].push(e); }
+  return map;
+}
+
+window.toggle = function (ticker) {
+  if (expanded.has(ticker)) expanded.delete(ticker); else expanded.add(ticker);
+  render();
+};
+
+function colorFor(ticker) {
+  let h = 0;
+  for (let i = 0; i < ticker.length; i++) h = (h * 31 + ticker.charCodeAt(i)) >>> 0;
+  return ["#18181b","#991b1b","#1d4ed8","#0f766e","#7c3aed","#a16207","#374151","#be185d","#065f46"][h % 9];
+}
+
+window.editEntry = function (id) { editingId = id; render(); };
+window.cancelEdit = function () { editingId = null; render(); };
+window.saveEdit = async function (id) {
+  const action = document.getElementById(`e-action-${id}`).value;
+  const price = parseFloat(document.getElementById(`e-price-${id}`).value);
+  const qty = parseFloat(document.getElementById(`e-qty-${id}`).value);
+  const date = document.getElementById(`e-date-${id}`).value;
+  const note = document.getElementById(`e-note-${id}`).value.trim();
+  if (isNaN(price) || isNaN(qty)) return;
+  try { await updateDoc(doc(db, "entries", id), { action, price, qty, date, note }); setError(false); }
+  catch { setError(true); }
+  editingId = null; render();
+};
 
 function renderSummary() {
   const sumEl = document.getElementById("summary");
   if (!entries.length) { sumEl.style.display = "none"; return; }
   sumEl.style.display = "block";
 
-  let totalValue = 0, totalCost = 0;
-  let totalPrevValue = 0, totalDayChange = 0;
-  let incomplete = false;
-
-  // group entries by ticker
-  const groups = {};
-  for (const e of entries) {
-    if (!groups[e.ticker]) groups[e.ticker] = [];
-    groups[e.ticker].push(e);
-  }
+  let totalValue = 0, totalCost = 0, incomplete = false;
+  const groups = groupByTicker(entries);
 
   for (const [ticker, txns] of Object.entries(groups)) {
-    const buyQty   = txns.filter(t => t.action==="buy").reduce((s,t) => s+t.qty, 0);
-    const buyValue = txns.filter(t => t.action==="buy").reduce((s,t) => s+t.qty*t.price, 0);
-    const sellQty  = txns.filter(t => t.action==="sell").reduce((s,t) => s+t.qty, 0);
+    const buyQty   = txns.filter(t=>t.action==="buy").reduce((s,t)=>s+t.qty,0);
+    const buyValue = txns.filter(t=>t.action==="buy").reduce((s,t)=>s+t.qty*t.price,0);
+    const sellQty  = txns.filter(t=>t.action==="sell").reduce((s,t)=>s+t.qty,0);
     const heldQty  = buyQty - sellQty;
     const avgCost  = buyQty > 0 ? buyValue / buyQty : 0;
     const cur = prices[ticker]?.price;
-
     if (!cur || heldQty <= 0) { if (heldQty > 0) incomplete = true; continue; }
-
     const val  = toThb(heldQty * cur, ticker);
     const cost = toThb(heldQty * avgCost, ticker);
     if (val === null || cost === null) { incomplete = true; continue; }
     totalValue += val;
     totalCost  += cost;
-
-    // Whole-portfolio 1-day change based on each stock's previous close.
-    // Foreign stocks are converted to THB using the current USD/THB rate.
-    if (prevClose !== null && prevClose > 0) {
-      const prevVal = toThb(heldQty * prevClose, ticker);
-      const dayChg  = toThb(heldQty * (cur - prevClose), ticker);
-
-      if (prevVal !== null && dayChg !== null) {
-        totalPrevValue += prevVal;
-        totalDayChange += dayChg;
-      }
-    }
   }
 
-  const pl    = totalValue - totalCost;
+  const pl = totalValue - totalCost;
   const plPct = totalCost > 0 ? (pl / totalCost) * 100 : 0;
-
-  const dayPct = totalPrevValue > 0
-    ? (totalDayChange / totalPrevValue) * 100
-    : null;
-  const dayCls = totalDayChange > 0
-    ? "pos"
-    : totalDayChange < 0
-      ? "neg"
-      : "flat";
-  const daySign = totalDayChange > 0 ? "+" : "";
-
-  const fmt   = (n) => "฿" + Math.round(n).toLocaleString();
+  const fmt = (n) => "฿" + Math.round(n).toLocaleString();
   const plCls = pl >= 0 ? "pos" : "neg";
   const plSign = pl >= 0 ? "+" : "";
-
-  // คำนวณ XIRR
-  // หุ้นไทย (.BK) ราคา THB, หุ้นต่างชาติ ราคา USD → แปลงด้วย fxRate ปัจจุบัน
-  let xirrEl = document.getElementById("sum-xirr");
-  if (!fxRate) {
-    xirrEl.textContent = "Need FX rate — click Refresh All";
-    xirrEl.className = "summary-pl flat";
-  } else {
-    try {
-      const cashflows = [];
-      for (const e of entries) {
-        const rawAmt = e.price * e.qty;
-        const amtThb = isThaiStock(e.ticker) ? rawAmt : rawAmt * fxRate;
-        if (!amtThb) continue;
-        cashflows.push({
-          date: e.date,
-          amount: e.action === "sell" ? amtThb : -amtThb,
-        });
-      }
-      if (totalValue > 0 && cashflows.length > 0) {
-        cashflows.push({ date: new Date().toISOString().slice(0,10), amount: totalValue });
-        cashflows.sort((a,b) => a.date.localeCompare(b.date));
-        const rate = xirr(cashflows);
-        if (isNaN(rate) || !isFinite(rate)) throw new Error("no convergence");
-        const xirrCls = rate >= 0 ? "pos" : "neg";
-        xirrEl.textContent = (rate >= 0 ? "+" : "") + (rate * 100).toFixed(2) + "% / year";
-        xirrEl.className = "summary-pl " + xirrCls;
-      } else {
-        xirrEl.textContent = "—";
-      }
-    } catch {
-      xirrEl.textContent = "N/A (not enough data)";
-    }
-  }
 
   document.getElementById("sum-value").textContent = fmt(totalValue);
   document.getElementById("sum-value-sub").textContent = incomplete ? "* some positions missing price" : "";
@@ -632,18 +531,30 @@ function renderSummary() {
   document.getElementById("sum-pct").textContent = plSign + plPct.toFixed(2) + "%";
   document.getElementById("sum-pct").className = "summary-pl " + plCls;
 
-  const dayEl = document.getElementById("sum-day-change");
-  const dayPctEl = document.getElementById("sum-day-pct");
-
-  if (totalPrevValue > 0) {
-    dayEl.textContent = daySign + fmt(totalDayChange);
-    dayEl.className = "summary-pl " + dayCls;
-    dayPctEl.textContent =
-      (dayPct >= 0 ? "+" : "") + dayPct.toFixed(2) + "%";
+  // XIRR
+  const xirrEl = document.getElementById("sum-xirr");
+  if (!fxRate) {
+    xirrEl.textContent = "XIRR: need FX rate";
+    xirrEl.className = "summary-sub summary-pl flat";
   } else {
-    dayEl.textContent = "—";
-    dayEl.className = "summary-pl flat";
-    dayPctEl.textContent = "Previous close unavailable";
+    try {
+      const cashflows = [];
+      for (const e of entries) {
+        const rawAmt = e.price * e.qty;
+        const amtThb = isThaiStock(e.ticker) ? rawAmt : rawAmt * fxRate;
+        if (!amtThb) continue;
+        cashflows.push({ date: e.date, amount: e.action === "sell" ? amtThb : -amtThb });
+      }
+      if (totalValue > 0 && cashflows.length > 0) {
+        cashflows.push({ date: new Date().toISOString().slice(0,10), amount: totalValue });
+        cashflows.sort((a,b) => a.date.localeCompare(b.date));
+        const rate = xirr(cashflows);
+        if (isNaN(rate) || !isFinite(rate)) throw new Error();
+        const xirrCls = rate >= 0 ? "pos" : "neg";
+        xirrEl.textContent = `XIRR: ${rate >= 0 ? "+" : ""}${(rate*100).toFixed(2)}% / yr`;
+        xirrEl.className = "summary-sub summary-pl " + xirrCls;
+      } else { xirrEl.textContent = "—"; }
+    } catch { xirrEl.textContent = "XIRR: N/A"; }
   }
 }
 
@@ -655,25 +566,20 @@ function render() {
   const list = document.getElementById("list");
   if (tickers.length === 0) { list.innerHTML = '<p class="empty">No entries yet.</p>'; renderSummary(); return; }
   renderSummary();
-  renderPerformance();
 
-  // คำนวณ total portfolio value สำหรับ % สัดส่วน
   const totalPortValue = tickers.reduce((sum, t) => {
     const grp = groups[t];
-    const bQty = grp.filter(x => x.action==="buy").reduce((s,x) => s+x.qty, 0);
-    const sQty = grp.filter(x => x.action==="sell").reduce((s,x) => s+x.qty, 0);
-    const held = bQty - sQty;
+    const held = grp.filter(x=>x.action==="buy").reduce((s,x)=>s+x.qty,0) - grp.filter(x=>x.action==="sell").reduce((s,x)=>s+x.qty,0);
     const p = prices[t]?.price;
     if (!p || held <= 0) return sum;
-    const valThb = isThaiStock(t) ? held * p : (fxRate ? held * p * fxRate : 0);
-    return sum + valThb;
+    return sum + (isThaiStock(t) ? held*p : (fxRate ? held*p*fxRate : 0));
   }, 0);
 
   list.innerHTML = tickers.map(ticker => {
     const txns = groups[ticker].slice().sort((a,b) => b.date.localeCompare(a.date));
-    const buyQty   = txns.filter(t => t.action==="buy").reduce((s,t) => s+t.qty, 0);
-    const buyValue = txns.filter(t => t.action==="buy").reduce((s,t) => s+t.qty*t.price, 0);
-    const sellQty  = txns.filter(t => t.action==="sell").reduce((s,t) => s+t.qty, 0);
+    const buyQty   = txns.filter(t=>t.action==="buy").reduce((s,t)=>s+t.qty,0);
+    const buyValue = txns.filter(t=>t.action==="buy").reduce((s,t)=>s+t.qty*t.price,0);
+    const sellQty  = txns.filter(t=>t.action==="sell").reduce((s,t)=>s+t.qty,0);
     const heldQty  = buyQty - sellQty;
     const avgBuy   = buyQty > 0 ? buyValue / buyQty : 0;
     const cur = prices[ticker]?.price;
@@ -683,33 +589,28 @@ function render() {
     const chgPct = chgAbs !== null && avgBuy > 0 ? (chgAbs/avgBuy)*100 : null;
     const plAbs  = chgAbs !== null && heldQty > 0 ? chgAbs * heldQty : null;
     const trend  = chgAbs === null ? "flat" : chgAbs > 0 ? "pos" : chgAbs < 0 ? "neg" : "flat";
-
     const currSym = isThaiStock(ticker) ? "฿" : "$";
     const fmtMoney = (n) => currSym + Math.abs(n).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
     const dayAbs = has && prevClose ? cur - prevClose : null;
     const dayPct = dayAbs !== null && prevClose ? (dayAbs/prevClose)*100 : null;
     const dayTrend = dayAbs === null ? "flat" : dayAbs > 0 ? "pos" : dayAbs < 0 ? "neg" : "flat";
     const dayHtml = dayAbs !== null
-      ? `<span class="day-change ${dayTrend}" style="font-size:12.5px;font-weight:600;">${dayAbs>=0?"+":""}${dayAbs.toLocaleString(undefined,{maximumFractionDigits:2})} (${dayPct>=0?"+":""}${dayPct.toFixed(2)}%)</span>`
+      ? `<span class="day-change ${dayTrend}">${dayAbs>=0?"+":""}${dayAbs.toLocaleString(undefined,{maximumFractionDigits:2})} (${dayPct>=0?"+":""}${dayPct.toFixed(2)}%)</span>`
       : "";
-
-    const portValueThb = has && heldQty > 0
-      ? (isThaiStock(ticker) ? heldQty * cur : (fxRate ? heldQty * cur * fxRate : 0))
-      : 0;
-    const portWeight = totalPortValue > 0 && portValueThb > 0 ? (portValueThb / totalPortValue) * 100 : null;
+    const portValueThb = has && heldQty > 0 ? (isThaiStock(ticker) ? heldQty*cur : (fxRate ? heldQty*cur*fxRate : 0)) : 0;
+    const portWeight = totalPortValue > 0 && portValueThb > 0 ? (portValueThb/totalPortValue)*100 : null;
     const portHtml = portWeight !== null
-      ? `<div class="port-bar-wrap"><div class="port-bar" style="width:${Math.min(portWeight,100).toFixed(1)}%"></div></div>
-         <div class="port-pct">${portWeight.toFixed(1)}% of portfolio</div>`
+      ? `<div class="port-bar-wrap"><div class="port-bar" style="width:${Math.min(portWeight,100).toFixed(1)}%"></div></div><div class="port-pct">${portWeight.toFixed(1)}% of portfolio</div>`
       : "";
     const isOpen = expanded.has(ticker);
 
     return `
       <div class="group">
         <div class="grow" onclick="toggle('${ticker}')">
-          <div class="badge" style="background:${colorFor(ticker)}">${ticker.slice(0,4)}</div>
+          <div class="badge" style="background:${colorFor(ticker)}">${ticker.replace(".BK","").slice(0,4)}</div>
           <div class="name">
             <div class="t">${ticker}</div>
-            <div class="qty">${heldQty.toLocaleString()} sh · avg ${avgBuy ? avgBuy.toLocaleString(undefined,{maximumFractionDigits:2}) : "—"}${dayHtml ? " · " + dayHtml.replace(/^<span /,'<span ') : ""}</div>
+            <div class="qty">${heldQty.toLocaleString()} sh · avg ${avgBuy ? avgBuy.toLocaleString(undefined,{maximumFractionDigits:2}) : "—"}${dayHtml ? " · "+dayHtml : ""}</div>
             ${portHtml}
           </div>
           <div class="price-col">
@@ -733,28 +634,20 @@ function render() {
             if (editingId === t.id) return `
               <div class="txn"><div class="txn-left" style="width:100%">
                 <div class="txn-form">
-                  <select id="e-action-${t.id}">
-                    <option value="buy" ${t.action==="buy"?"selected":""}>Buy</option>
-                    <option value="sell" ${t.action==="sell"?"selected":""}>Sell</option>
-                    <option value="watch" ${t.action==="watch"?"selected":""}>Watch</option>
-                  </select>
+                  <select id="e-action-${t.id}"><option value="buy" ${t.action==="buy"?"selected":""}>Buy</option><option value="sell" ${t.action==="sell"?"selected":""}>Sell</option><option value="watch" ${t.action==="watch"?"selected":""}>Watch</option></select>
                   <input id="e-date-${t.id}" type="date" value="${t.date}">
                   <input id="e-price-${t.id}" type="number" placeholder="Price" value="${t.price}">
                   <input id="e-qty-${t.id}" type="number" placeholder="Quantity" value="${t.qty}">
                   <input id="e-note-${t.id}" placeholder="Note (optional)" value="${t.note||""}" style="grid-column:span 2">
-                  <div class="txn-form-btns">
-                    <button class="btn-save" onclick="saveEdit('${t.id}')">Save</button>
-                    <button class="btn-cancel" onclick="cancelEdit()">Cancel</button>
-                  </div>
+                  <div class="txn-form-btns"><button class="btn-save" onclick="saveEdit('${t.id}')">Save</button><button class="btn-cancel" onclick="cancelEdit()">Cancel</button></div>
                 </div>
               </div></div>`;
             return `
             <div class="txn">
               <div class="txn-left">
                 <span class="tag ${t.action}">${LABELS[t.action]}</span>
-                <div style="font-size:11px;color:#8b8b98;margin-bottom:2px;">${t.date}${t.note?" · "+t.note:""}</div>
-                <span>${t.qty.toLocaleString()} sh @ ${t.price.toLocaleString()}</span>
-                ${profit}
+                <div style="font-size:11px;color:#8b8b98;margin-bottom:1px;">${t.date}${t.note?" · "+t.note:""}</div>
+                <span>${t.qty.toLocaleString()} sh @ ${t.price.toLocaleString()}</span>${profit}
               </div>
               <div class="txn-actions">
                 <button class="txn-edit" onclick="editEntry('${t.id}')">✎</button>
