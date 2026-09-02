@@ -624,7 +624,7 @@ function render() {
     const portValueThb = has && heldQty > 0 ? (isThaiStock(ticker) ? heldQty*cur : (fxRate ? heldQty*cur*fxRate : 0)) : 0;
     const portWeight = totalPortValue > 0 && portValueThb > 0 ? (portValueThb/totalPortValue)*100 : null;
     const portHtml = portWeight !== null
-      ? `<div class="port-bar-wrap"><div class="port-bar" style="width:${Math.min(portWeight,100).toFixed(1)}%"></div></div><div class="port-pct">${portWeight.toFixed(1)}% of portfolio</div>`
+      ? `<div class="port-bar-wrap"><div class="port-bar" style="width:${Math.min(portWeight,100).toFixed(1)}%"></div></div><div class="port-pct">${portWeight.toFixed(1)}% · ฿${Math.round(portValueThb).toLocaleString()}</div>`
       : "";
     const isOpen = expanded.has(ticker);
 
@@ -671,7 +671,7 @@ function render() {
               <div class="txn-left">
                 <span class="tag ${t.action}">${LABELS[t.action]}</span>
                 <div style="font-size:11px;color:#8b8b98;margin-bottom:1px;">${t.date}${t.note?" · "+t.note:""}</div>
-                <span>${t.qty.toLocaleString()} sh @ ${t.price.toLocaleString()}</span>${profit}
+                <span>${t.qty.toLocaleString()} sh @ ${t.price.toLocaleString()} = ${isThaiStock(ticker) ? "฿" : "$"}${(t.qty * t.price).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2})}</span>${profit}
               </div>
               <div class="txn-actions">
                 <button class="txn-edit" onclick="editEntry('${t.id}')">✎</button>
